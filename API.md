@@ -3,6 +3,47 @@ API
 
 All of the API functions for Worldgate are defined in the `worldgate` global variable.
 
+## Server Transfer API
+
+### `worldgate.server_api.register_server(callback)`
+
+Registers the current server in the Supabase database. This is called automatically on server startup. The callback receives `(success, server_id)`.
+
+### `worldgate.server_api.register_gate(position, base, decor, quality, callback)`
+
+Registers a worldgate in the database. Parameters:
+- `position` - Vector position of the gate
+- `base` - Base schematic path
+- `decor` - Decor schematic path
+- `quality` - Gate quality (-1, 0, or 1)
+- `callback` - Function called with `(success, data)`
+
+### `worldgate.server_api.link_gates(source_gate_id, destination_gate_id, destination_server_id, callback)`
+
+Links two gates together across servers. Parameters:
+- `source_gate_id` - UUID of source gate
+- `destination_gate_id` - UUID of destination gate
+- `destination_server_id` - UUID of destination server
+- `callback` - Function called with `(success, data)`
+
+### `worldgate.server_api.get_gate_destination(gate_id, callback)`
+
+Retrieves destination information for a gate.
+
+### `worldgate.server_api.log_transfer(player_name, source_gate_id, dest_gate_id, dest_server_id, success, callback)`
+
+Logs a player transfer to the database.
+
+### `worldgate.initiate_transfer(beacon_pos, player)`
+
+Initiates a server transfer for a player at a beacon. This is called automatically when a player right-clicks a beacon.
+
+### `worldgate.link_gates_manual(source_pos, dest_gate_id, dest_server_id)`
+
+Manually link a gate at `source_pos` to a destination gate. Returns `(success, error_message)`.
+
+## Gate Generation API
+
 ### `worldgate.add_gate(def)`
 
 This function adds a worldgate to the world. This is useful for adding your own custom worldgates to the world. The `def` parameter must be a table with the following fields:

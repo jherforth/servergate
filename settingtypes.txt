@@ -1,11 +1,20 @@
+# Server identification name
+worldgate.server_name (Server Name) string My Server
+
+# Supabase database URL for gate synchronization
+worldgate.supabase_url (Supabase URL) string
+
+# Supabase anonymous key for database access
+worldgate.supabase_anon_key (Supabase Anon Key) string
+
 # Enable mapgen? Unset this to prevent all worldgates from generating.
 worldgate.mapgen (Enable mapgen?) bool true
 
 # Generate native worldgates? Native worldgates are the built-in worldgates that this mod provides by default.
 worldgate.native (Generate native worldgates?) bool true
 
-# Link native worldgates? This links surface worldgates to a random neighbor and underground/aerial worldgates to worldgates on the surface.
-worldgate.native.link (Link native worldgates?) bool true
+# Link native worldgates? For server connector, set to false to link gates manually via database.
+worldgate.native.link (Link native worldgates?) bool false
 
 # Average number of nodes between native worldgates.
 worldgate.native.spread (Distance between native worldgates) int 1000 500 25000
@@ -25,14 +34,8 @@ worldgate.underwaterspawn (Generate worldgates underwater?) bool false
 # Generate worldgates in midair? If set, worldgates can be floating on their own in the air; if unset, gates that attempt to generate in the air will fail to generate.
 worldgate.midairspawn (Generate worldgates in midair?) bool false
 
-# Percentage chance of a Telemosaic extender structure node being broken when a gate generates. This causes extenders to be replaced with cobblestone.
-worldgate.breakage (Percent chance of an extender being broken) int 8 0 100
+# Percentage chance of a decorative structure node being broken when a gate generates.
+worldgate.breakage (Percent chance of structure damage) int 8 0 100
 
-# Increase extender range? This supersedes the Telemosaic configuration values for extender ranges. If you wish to use the Telemosaic settings instead, unset this configuration option and change the Telemosaic settings accordingly.
-worldgate.superextenders (Increase extender range?) bool true
-
-# Glowing Telemosaic beacons?
-worldgate.beaconglow (Glowing Telemosaic beacons?) bool true
-
-# Consume Mese Crystal Fragments after converting to a Telemosaic key? By default, Telemosaic keys are converted back to crystal fragments after use.
-worldgate.destroykeys (Consume Telemosaic keys?) bool false
+# Glowing worldgate beacons?
+worldgate.beaconglow (Glowing beacons?) bool true

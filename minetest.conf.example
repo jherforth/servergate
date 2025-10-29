@@ -1,0 +1,26 @@
+# Worldgate Server Connector Configuration
+# Copy these settings to your minetest.conf file
+
+# Server identification
+worldgate.server_name = My Server Name
+
+# Supabase connection (required for server-to-server transfers)
+worldgate.supabase_url = https://your-project.supabase.co
+worldgate.supabase_anon_key = your-anon-key-here
+
+# HTTP API access (required for Supabase communication)
+# Add worldgate to the list of mods that can use HTTP
+secure.http_mods = worldgate
+
+# Worldgate generation settings (same as original)
+worldgate.mapgen = true
+worldgate.native = true
+worldgate.native.link = false
+worldgate.native.spread = 1000
+worldgate.native.xzjitter = 12.5
+worldgate.ymin = -29900
+worldgate.ymax = 29900
+worldgate.underwaterspawn = false
+worldgate.midairspawn = false
+worldgate.breakage = 8
+worldgate.beaconglow = true

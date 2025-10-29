@@ -26,14 +26,15 @@ local schematic_platform = worldgate.modpath .. "/schematics/worldgate_platform.
 
 local extender_break_chance = worldgate.settings.breakage
 
+-- Simplified extender nodes (just decorative now)
 local quality_selector = {
-  [0] = function(pcgr) -- 25% chance for tier 1 extender to be cobblestone
-    return { name = (pcgr:next(1,4) == 1 and "default:cobble" or "telemosaic:extender_one"), param2 = 0 }
+  [0] = function(pcgr)
+    return { name = (pcgr:next(1,4) == 1 and "default:cobble" or "default:stone_brick"), param2 = 0 }
   end,
-  function() return { name = "telemosaic:extender_one", param2 = 0 } end,
-  function() return { name = "telemosaic:extender_two", param2 = 0 } end,
-  function() return { name = "telemosaic:extender_three", param2 = 0 } end,
-  function() return { name = "telemosaic:extender_three", param2 = 0 } end,
+  function() return { name = "default:stone_brick", param2 = 0 } end,
+  function() return { name = "default:stone_brick", param2 = 0 } end,
+  function() return { name = "default:stone_brick", param2 = 0 } end,
+  function() return { name = "default:stone_brick", param2 = 0 } end,
 }
 
 local water = {
@@ -272,27 +273,40 @@ minetest.register_on_generated(function(minp,maxp,blockseed)
       end
     end
 
-    -- Write the gate's position to the beacon's node meta for linking purposes if possible
-    local beacon = (function()
-      for dy = 2, 0, -1 do
-        local beacon_location = location:add(vn(0,dy,0))
-        local beacon_node = minetest.get_node(beacon_location)
-        if beacon_node and beacon_node.name:find("^telemosaic:beacon") then
-          return beacon_location
-        end
-      end
-    end)()
+    -- Place the worldgate beacon and register it in the database
+    local beacon_location = location:add(vn(0,1,0))
+    minetest.swap_node(beacon_location, {name = "worldgate:beacon_off", param2 = 0})
 
-    if beacon then
-      local nodemeta = minetest.get_meta(beacon)
-      nodemeta:set_string("worldgate:source",minetest.pos_to_string(gate.position))
-      if gate.destination then
-        nodemeta:set_string("worldgate:destination",minetest.pos_to_string(gate.destination))
-        minetest.swap_node(beacon,{ name = "telemosaic:beacon", param2 = 0 })
+    -- Register gate in database asynchronously
+    minetest.after(2, function()
+      if worldgate.server_api and worldgate.server_api.register_gate then
+        worldgate.server_api.register_gate(
+          gate.position,
+          gate.base,
+          gate.decor,
+          gate.quality,
+          function(success, data)
+            if success and data and data[1] then
+              local gate_id = data[1].id
+              local nodemeta = minetest.get_meta(beacon_location)
+              nodemeta:set_string("worldgate:gate_id", gate_id)
+              nodemeta:set_string("worldgate:source", minetest.pos_to_string(gate.position))
+
+              minetest.log("action", "Worldgate registered at " .. minetest.pos_to_string(beacon_location) .. " with ID: " .. gate_id)
+
+              -- Activate beacon if gate.destination exists (for compatibility)
+              if gate.destination then
+                minetest.swap_node(beacon_location, {name = "worldgate:beacon", param2 = 0})
+              end
+            else
+              minetest.log("warning", "Failed to register worldgate at " .. minetest.pos_to_string(location))
+            end
+          end
+        )
+      else
+        minetest.log("warning", "Server API not available, worldgate at " .. minetest.pos_to_string(location) .. " not registered")
       end
-    else
-      minetest.log("warning","Unable to set beacon node meta for worldgate at " .. minetest.pos_to_string(location))
-    end
+    end)
 
     -- Fix lighting
     minetest.fix_light(location:add(vn(-6,-8,-6)),location:add(vn(6,11,6)))
