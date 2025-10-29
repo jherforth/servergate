@@ -11,7 +11,19 @@ This guide will help you set up a network of Luanti/Minetest servers connected v
 - Server admin access with `server` privilege
 - (Optional) `mysql_base` mod for Minetest/Luanti
 
+## 📚 Need Database Help?
+
+**First time setting up MySQL?** We have a complete guide for you:
+
+👉 **[MySQL Setup for Complete Beginners](MYSQL_SETUP_FOR_BEGINNERS.md)** 👈
+
+It covers everything from installation to troubleshooting with step-by-step instructions.
+
+---
+
 ## Step 1: Set Up MariaDB Database
+
+### Quick Setup (Experienced Users)
 
 On your database server:
 
@@ -25,14 +37,19 @@ sudo apt-get install mariadb-server
 mysql -u root -p < database_schema.sql
 ```
 
-3. Make sure the database is accessible from your game servers
+3. Create database user:
+```sql
+CREATE USER 'worldgate'@'%' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON worldgate.* TO 'worldgate'@'%';
+FLUSH PRIVILEGES;
+```
 
 4. Note your database connection details:
-   - Host (e.g., `192.168.1.100`)
+   - Host (e.g., `192.168.1.100` or `localhost`)
    - Port (default: `3306`)
    - Database name (`worldgate`)
    - Username (`worldgate`)
-   - Password (you set this in the SQL file)
+   - Password (what you just set)
 
 ## Step 2: Install the Mod
 

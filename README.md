@@ -22,17 +22,38 @@ A Luanti/Minetest mod that generates ancient worldgate structures throughout you
 5. Players disconnect and reconnect using the provided server address
 6. Transfer cooldowns prevent spam (5 seconds by default)
 
+**📖 Want to understand the architecture?** See [ARCHITECTURE.md](ARCHITECTURE.md) for diagrams and detailed explanations.
+
 ## Setup
 
-### 1. MariaDB/MySQL Database
+### Quick Start Guides
 
-Set up a MariaDB or MySQL database that all your servers can access:
+Choose the guide that matches your experience level:
 
-1. Install MariaDB on your private network
-2. Run the provided `database_schema.sql` to create the tables
-3. Create a user with access to the worldgate database
-4. Make sure your servers can connect to the database
+- **✅ SETUP CHECKLIST** → [SETUP_CHECKLIST.md](SETUP_CHECKLIST.md)
+  - Complete step-by-step checklist
+  - Verify each component works
+  - Troubleshooting for each step
 
+- **🌟 NEW TO DATABASES?** → [MySQL Setup for Complete Beginners](MYSQL_SETUP_FOR_BEGINNERS.md)
+  - Step-by-step instructions with explanations
+  - Covers installation, security, and testing
+  - Troubleshooting for common issues
+
+- **💪 EXPERIENCED USER?** → [MariaDB Advanced Setup](MARIADB_SETUP.md)
+  - Network configuration
+  - Performance tuning
+  - Production deployment
+
+### 1. Database Setup
+
+Set up a MySQL/MariaDB database that all your servers can access:
+
+1. Follow the [MySQL Setup for Complete Beginners](MYSQL_SETUP_FOR_BEGINNERS.md) guide
+2. Run the provided `database_schema.sql` to create tables
+3. Register each server with `/worldgate_register_server`
+
+**Quick install:**
 ```bash
 mysql -u root -p < database_schema.sql
 ```
@@ -99,6 +120,17 @@ Where:
 - By default, gates generate roughly every 1000 nodes
 - Transfer cooldown is 5 seconds to prevent spam
 - Gates register in the database 2 seconds after generation
+
+## 📚 Documentation
+
+- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Commands and queries cheat sheet
+- **[SETUP_CHECKLIST.md](SETUP_CHECKLIST.md)** - Complete setup verification
+- **[MYSQL_SETUP_FOR_BEGINNERS.md](MYSQL_SETUP_FOR_BEGINNERS.md)** - Database setup guide
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture and diagrams
+- **[TRANSFER_SCREEN.md](TRANSFER_SCREEN.md)** - Customize transfer interface
+- **[API.md](API.md)** - Full API reference
+- **[DATABASE_QUERIES.md](DATABASE_QUERIES.md)** - Advanced database queries
+- **[MARIADB_SETUP.md](MARIADB_SETUP.md)** - Advanced database setup
 
 ## Technical Details
 
