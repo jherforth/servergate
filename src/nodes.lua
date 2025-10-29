@@ -31,17 +31,18 @@ for name,def in pairs({
 end
 
 --
--- Worldgate beacon node for server transfers
+-- Servergate beacon nodes for cross-server transfers
+-- These are distinct from telemosaic beacons to avoid conflicts
 --
 
-minetest.register_node("worldgate:beacon", {
-  description = "Worldgate Beacon",
+minetest.register_node("worldgate:servergate_beacon", {
+  description = "Servergate Beacon",
   tiles = {
-    "default_stone_brick.png^[colorize:#4444FF:100",
+    "default_stone_brick.png^[colorize:#00FFFF:120",
   },
   groups = {
     cracky = 3,
-    worldgate_beacon = 1,
+    servergate_beacon = 1,
   },
   light_source = worldgate.settings.beaconglow and 14 or 0,
   paramtype = "light",
@@ -56,16 +57,20 @@ minetest.register_node("worldgate:beacon", {
   end,
 })
 
-minetest.register_node("worldgate:beacon_off", {
-  description = "Inactive Worldgate Beacon",
+minetest.register_node("worldgate:servergate_beacon_off", {
+  description = "Inactive Servergate Beacon",
   tiles = {
-    "default_stone_brick.png^[colorize:#666666:100",
+    "default_stone_brick.png^[colorize:#444444:120",
   },
   groups = {
     cracky = 3,
-    worldgate_beacon = 1,
+    servergate_beacon = 1,
   },
   paramtype = "light",
   drawtype = "glasslike",
   sunlight_propagates = true,
 })
+
+-- Alias old names for backwards compatibility
+minetest.register_alias("worldgate:beacon", "worldgate:servergate_beacon")
+minetest.register_alias("worldgate:beacon_off", "worldgate:servergate_beacon_off")

@@ -39,10 +39,10 @@ worldgate.initiate_transfer = function(beacon_pos, player)
   original_initiate(beacon_pos, player)
 end
 
--- ABM to keep beacons active and manage their state
+-- ABM to keep servergate beacons active and manage their state
 minetest.register_abm({
-  label = "Worldgate beacon management",
-  nodenames = {"worldgate:beacon", "worldgate:beacon_off"},
+  label = "Servergate beacon management",
+  nodenames = {"worldgate:servergate_beacon", "worldgate:servergate_beacon_off"},
   interval = 5,
   chance = 1,
   catch_up = false,
@@ -52,13 +52,13 @@ minetest.register_abm({
 
     -- If beacon has no gate_id, deactivate it
     if not gate_id or gate_id == "" then
-      if node.name == "worldgate:beacon" then
-        minetest.swap_node(pos, {name = "worldgate:beacon_off", param2 = 0})
+      if node.name == "worldgate:servergate_beacon" then
+        minetest.swap_node(pos, {name = "worldgate:servergate_beacon_off", param2 = 0})
       end
     else
       -- If beacon has gate_id, ensure it's active
-      if node.name == "worldgate:beacon_off" then
-        minetest.swap_node(pos, {name = "worldgate:beacon", param2 = 0})
+      if node.name == "worldgate:servergate_beacon_off" then
+        minetest.swap_node(pos, {name = "worldgate:servergate_beacon", param2 = 0})
       end
     end
   end,
@@ -76,7 +76,7 @@ function worldgate.link_gates_manual(source_pos, dest_gate_id, dest_server_id)
   worldgate.server_api.link_gates(source_gate_id, dest_gate_id, dest_server_id, function(success, data)
     if success then
       minetest.log("action", "Worldgate: Linked gate " .. source_gate_id .. " to " .. dest_gate_id)
-      minetest.swap_node(source_pos, {name = "worldgate:beacon", param2 = 0})
+      minetest.swap_node(source_pos, {name = "worldgate:servergate_beacon", param2 = 0})
     else
       minetest.log("error", "Worldgate: Failed to link gates")
     end

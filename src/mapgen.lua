@@ -273,9 +273,9 @@ minetest.register_on_generated(function(minp,maxp,blockseed)
       end
     end
 
-    -- Place the worldgate beacon and register it in the database
+    -- Place the servergate beacon and register it in the database
     local beacon_location = location:add(vn(0,1,0))
-    minetest.swap_node(beacon_location, {name = "worldgate:beacon_off", param2 = 0})
+    minetest.swap_node(beacon_location, {name = "worldgate:servergate_beacon_off", param2 = 0})
 
     -- Register gate in database asynchronously
     minetest.after(2, function()
@@ -292,19 +292,19 @@ minetest.register_on_generated(function(minp,maxp,blockseed)
               nodemeta:set_string("worldgate:gate_id", gate_id)
               nodemeta:set_string("worldgate:source", minetest.pos_to_string(gate.position))
 
-              minetest.log("action", "Worldgate registered at " .. minetest.pos_to_string(beacon_location) .. " with ID: " .. gate_id)
+              minetest.log("action", "Servergate registered at " .. minetest.pos_to_string(beacon_location) .. " with ID: " .. gate_id)
 
               -- Activate beacon if gate.destination exists (for compatibility)
               if gate.destination then
-                minetest.swap_node(beacon_location, {name = "worldgate:beacon", param2 = 0})
+                minetest.swap_node(beacon_location, {name = "worldgate:servergate_beacon", param2 = 0})
               end
             else
-              minetest.log("warning", "Failed to register worldgate at " .. minetest.pos_to_string(location))
+              minetest.log("warning", "Failed to register servergate at " .. minetest.pos_to_string(location))
             end
           end
         )
       else
-        minetest.log("warning", "Server API not available, worldgate at " .. minetest.pos_to_string(location) .. " not registered")
+        minetest.log("warning", "Server API not available, servergate at " .. minetest.pos_to_string(location) .. " not registered")
       end
     end)
 

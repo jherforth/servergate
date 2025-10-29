@@ -36,19 +36,23 @@ This mod has been transformed from a local teleportation system (based on Telemo
 
 1. **Removed Telemosaic Dependency**
    - No longer requires the Telemosaic mod
-   - Created new beacon nodes: `worldgate:beacon` and `worldgate:beacon_off`
+   - Created new servergate beacon nodes: `worldgate:servergate_beacon` and `worldgate:servergate_beacon_off`
    - Beacons now trigger server transfers instead of local teleportation
+   - Servergate beacons are cyan/light blue to distinguish from telemosaic beacons (blue)
+   - Both mods can now coexist in the same world without conflicts
 
 2. **Added Database Synchronization**
-   - New Supabase integration for cross-server coordination
+   - MariaDB/MySQL integration for cross-server coordination
+   - Self-hosted database on your private network
    - Three database tables:
-     - `servers` - Server registry
+     - `servers` - Server registry with configurable URLs
      - `worldgates` - Gate positions and links
      - `transfer_logs` - Transfer history
 
 3. **Server Transfer System**
-   - New `server_api.lua` module for HTTP/Supabase communication
+   - New `server_api.lua` module for MariaDB/MySQL communication
    - Automatic server registration and heartbeat
+   - Configurable server URLs for player transfers
    - Gate registration in database on generation
    - Cross-server gate linking capability
 

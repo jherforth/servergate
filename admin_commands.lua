@@ -23,7 +23,7 @@ minetest.register_chatcommand("worldgate_info", {
         local node_pos = pointed_thing.under
         local node = minetest.get_node(node_pos)
 
-        if minetest.get_item_group(node.name, "worldgate_beacon") > 0 then
+        if minetest.get_item_group(node.name, "servergate_beacon") > 0 then
           local meta = minetest.get_meta(node_pos)
           local gate_id = meta:get_string("worldgate:gate_id")
           local source = meta:get_string("worldgate:source")
@@ -31,13 +31,13 @@ minetest.register_chatcommand("worldgate_info", {
           if gate_id and gate_id ~= "" then
             return true, "Gate ID: " .. gate_id .. "\nSource: " .. source .. "\nPosition: " .. minetest.pos_to_string(node_pos)
           else
-            return false, "This beacon is not registered in the database"
+            return false, "This servergate beacon is not registered in the database"
           end
         end
       end
     end
 
-    return false, "No worldgate beacon found"
+    return false, "No servergate beacon found"
   end,
 })
 
@@ -67,18 +67,18 @@ minetest.register_chatcommand("worldgate_link", {
         local node_pos = pointed_thing.under
         local node = minetest.get_node(node_pos)
 
-        if minetest.get_item_group(node.name, "worldgate_beacon") > 0 then
+        if minetest.get_item_group(node.name, "servergate_beacon") > 0 then
           local success, err = worldgate.link_gates_manual(node_pos, dest_gate_id, dest_server_id)
           if success then
-            return true, "Gate linking initiated. Check server log for confirmation."
+            return true, "Servergate linking initiated. Check server log for confirmation."
           else
-            return false, err or "Failed to link gates"
+            return false, err or "Failed to link servergates"
           end
         end
       end
     end
 
-    return false, "No worldgate beacon found"
+    return false, "No servergate beacon found"
   end,
 })
 

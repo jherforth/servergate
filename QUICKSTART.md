@@ -85,12 +85,12 @@ worldgate.native.link = false
 ### Find Gate IDs
 
 On Server Alpha:
-1. Find a worldgate beacon (glowing blue block)
+1. Find a servergate beacon (glowing cyan/light blue block in the center of a worldgate structure)
 2. Look at it and run: `/worldgate_info`
 3. Note the `Gate ID` (a UUID like `12345678-abcd-...`)
 
 On Server Beta:
-1. Find another worldgate beacon
+1. Find another servergate beacon
 2. Look at it and run: `/worldgate_info`
 3. Note the `Gate ID`
 

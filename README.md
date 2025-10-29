@@ -7,16 +7,17 @@ A Luanti/Minetest mod that generates ancient worldgate structures throughout you
 
 - **Automatic Gate Generation**: Worldgates spawn throughout the world with various architectural styles
 - **Server Network**: Connect multiple Luanti/Minetest servers through a shared database
-- **Cross-Server Transfers**: Players can transfer between servers by using linked worldgates
+- **Cross-Server Transfers**: Players can transfer between servers by using linked servergates
 - **Transfer Logging**: All transfers are logged for debugging and analytics
 - **Configurable Spawning**: Control where and how gates generate in your world
+- **Distinct Beacons**: Servergate beacons (cyan) are visually distinct from telemosaic beacons to avoid conflicts
 
 ## How It Works
 
 1. Each server runs the worldgate mod and connects to a shared MariaDB/MySQL database
-2. When gates generate, they are automatically registered in the database
-3. Server admins can link gates between different servers
-4. Players right-click a beacon to see connection information for the destination server
+2. When gates generate, they spawn with cyan servergate beacons in their centers
+3. Server admins can link servergate beacons between different servers
+4. Players right-click a servergate beacon to see connection information for the destination server
 5. Transfer cooldowns prevent spam (5 seconds by default)
 
 ## Setup
