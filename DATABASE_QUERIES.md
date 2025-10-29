@@ -1,30 +1,35 @@
 # Useful Database Queries
 
-These SQL queries can be run in the Supabase SQL Editor for managing your worldgate network.
+These SQL queries can be run directly on your MariaDB/MySQL server for managing your worldgate network.
+
+Connect to your database:
+```bash
+mysql -u worldgate -p worldgate
+```
 
 ## Server Management
 
 ### List All Active Servers
 ```sql
-SELECT name, host, port, updated_at
+SELECT name, url, updated_at
 FROM servers
-WHERE is_active = true
+WHERE is_active = 1
 ORDER BY name;
 ```
 
 ### Find Inactive Servers
 ```sql
-SELECT name, host, port, updated_at
+SELECT name, url, updated_at
 FROM servers
-WHERE is_active = false
-  OR updated_at < NOW() - INTERVAL '5 minutes'
+WHERE is_active = 0
+  OR updated_at < NOW() - INTERVAL 5 MINUTE
 ORDER BY updated_at DESC;
 ```
 
 ### Deactivate a Server
 ```sql
 UPDATE servers
-SET is_active = false
+SET is_active = 0
 WHERE name = 'Server Name';
 ```
 

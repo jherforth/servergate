@@ -1,26 +1,76 @@
 # Worldgate Server Connector Configuration
 # Copy these settings to your minetest.conf file
 
-# Server identification
+# ======================
+# Server Identification
+# ======================
+
+# Unique name for this server (will be shown to players)
 worldgate.server_name = My Server Name
 
-# Supabase connection (required for server-to-server transfers)
-worldgate.supabase_url = https://your-project.supabase.co
-worldgate.supabase_anon_key = your-anon-key-here
+# URL players should connect to (shown when using worldgates)
+# Format: minetest://hostname:port or hostname:port
+worldgate.server_url = minetest://play.example.com:30000
 
-# HTTP API access (required for Supabase communication)
-# Add worldgate to the list of mods that can use HTTP
-secure.http_mods = worldgate
+# ======================
+# Database Configuration
+# ======================
 
-# Worldgate generation settings (same as original)
+# MariaDB/MySQL host
+worldgate.db_host = localhost
+
+# MariaDB/MySQL port (default: 3306)
+worldgate.db_port = 3306
+
+# Database name
+worldgate.db_name = worldgate
+
+# Database user
+worldgate.db_user = worldgate
+
+# Database password
+worldgate.db_password = your_secure_password_here
+
+# ======================
+# Gate Generation Settings
+# ======================
+
+# Enable worldgate generation
 worldgate.mapgen = true
+
+# Enable native gate generation
 worldgate.native = true
+
+# Auto-link gates locally (set to false for multi-server)
 worldgate.native.link = false
+
+# Distance between gates in nodes
 worldgate.native.spread = 1000
+
+# Random offset percentage for gate positions
 worldgate.native.xzjitter = 12.5
+
+# Minimum Y coordinate for gates
 worldgate.ymin = -29900
+
+# Maximum Y coordinate for gates
 worldgate.ymax = 29900
+
+# Allow underwater spawning
 worldgate.underwaterspawn = false
+
+# Allow midair spawning
 worldgate.midairspawn = false
+
+# Percentage chance of structure damage
 worldgate.breakage = 8
+
+# Make beacons glow
 worldgate.beaconglow = true
+
+# ======================
+# Required for MySQL Support
+# ======================
+
+# If using mysql_base mod, no additional configuration needed
+# If MySQL mod is not available, mod will use local storage as fallback

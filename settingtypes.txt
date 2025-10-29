@@ -1,11 +1,23 @@
 # Server identification name
 worldgate.server_name (Server Name) string My Server
 
-# Supabase database URL for gate synchronization
-worldgate.supabase_url (Supabase URL) string
+# Server URL that players connect to
+worldgate.server_url (Server URL) string minetest://localhost:30000
 
-# Supabase anonymous key for database access
-worldgate.supabase_anon_key (Supabase Anon Key) string
+# MariaDB/MySQL database host
+worldgate.db_host (Database Host) string localhost
+
+# MariaDB/MySQL database port
+worldgate.db_port (Database Port) int 3306 1 65535
+
+# Database name
+worldgate.db_name (Database Name) string worldgate
+
+# Database user
+worldgate.db_user (Database User) string worldgate
+
+# Database password
+worldgate.db_password (Database Password) string
 
 # Enable mapgen? Unset this to prevent all worldgates from generating.
 worldgate.mapgen (Enable mapgen?) bool true

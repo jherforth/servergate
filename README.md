@@ -1,7 +1,7 @@
 Worldgate Server Connector
 ==========================
 
-A Luanti/Minetest mod that generates ancient worldgate structures throughout your world and enables server-to-server player transfers. Worldgates are synchronized across multiple servers via Supabase, allowing players to travel between different game servers through the gate network.
+A Luanti/Minetest mod that generates ancient worldgate structures throughout your world and enables server-to-server player transfers. Worldgates are synchronized across multiple servers via MariaDB/MySQL, allowing players to travel between different game servers through the gate network.
 
 ## Features
 
@@ -13,39 +13,51 @@ A Luanti/Minetest mod that generates ancient worldgate structures throughout you
 
 ## How It Works
 
-1. Each server runs the worldgate mod and connects to a shared Supabase database
+1. Each server runs the worldgate mod and connects to a shared MariaDB/MySQL database
 2. When gates generate, they are automatically registered in the database
 3. Server admins can link gates between different servers
-4. Players right-click a beacon to transfer to another server
+4. Players right-click a beacon to see connection information for the destination server
 5. Transfer cooldowns prevent spam (5 seconds by default)
 
 ## Setup
 
-### 1. Supabase Database
+### 1. MariaDB/MySQL Database
 
-You need a Supabase project to synchronize gates between servers. The mod will automatically create the required tables on first run.
+Set up a MariaDB or MySQL database that all your servers can access:
 
-1. Create a free account at [supabase.com](https://supabase.com)
-2. Create a new project
-3. Get your project URL and anon key from the API settings
+1. Install MariaDB on your private network
+2. Run the provided `database_schema.sql` to create the tables
+3. Create a user with access to the worldgate database
+4. Make sure your servers can connect to the database
 
-### 2. Server Configuration
+```bash
+mysql -u root -p < database_schema.sql
+```
 
-Add these settings to your `minetest.conf` (see `minetest.conf.example` for full options):
+### 2. Install mysql_base Mod (Optional but Recommended)
+
+For multi-server support, install a MySQL connectivity mod like `mysql_base`. Without it, the mod will work in single-server mode using mod_storage as a fallback.
+
+### 3. Server Configuration
+
+Add these settings to your `minetest.conf` on each server (see `minetest.conf.example` for full options):
 
 ```
 # Server identification
-worldgate.server_name = My Server Name
+worldgate.server_name = My Server Alpha
 
-# Supabase connection
-worldgate.supabase_url = https://your-project.supabase.co
-worldgate.supabase_anon_key = your-anon-key-here
+# URL players should connect to
+worldgate.server_url = minetest://play.example.com:30000
 
-# Enable HTTP API access
-secure.http_mods = worldgate
+# Database connection
+worldgate.db_host = 192.168.1.100
+worldgate.db_port = 3306
+worldgate.db_name = worldgate
+worldgate.db_user = worldgate
+worldgate.db_password = your_secure_password
 ```
 
-### 3. Linking Gates
+### 4. Linking Gates
 
 Gates can be linked using the Lua API:
 
