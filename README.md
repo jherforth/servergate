@@ -8,6 +8,7 @@ A Luanti/Minetest mod that generates ancient worldgate structures throughout you
 - **Automatic Gate Generation**: Worldgates spawn throughout the world with various architectural styles
 - **Server Network**: Connect multiple Luanti/Minetest servers through a shared database
 - **Cross-Server Transfers**: Players can transfer between servers by using linked servergates
+- **Visual Transfer Screen**: Beautiful fullscreen portal animation when transferring servers
 - **Transfer Logging**: All transfers are logged for debugging and analytics
 - **Configurable Spawning**: Control where and how gates generate in your world
 - **Distinct Beacons**: Servergate beacons (red) are visually distinct from worldgate/telemosaic beacons (blue) to avoid conflicts
@@ -17,8 +18,9 @@ A Luanti/Minetest mod that generates ancient worldgate structures throughout you
 1. Each server runs the worldgate mod and connects to a shared MariaDB/MySQL database
 2. When gates generate, they spawn with red servergate beacons in their centers
 3. Server admins can link servergate beacons between different servers
-4. Players right-click a servergate beacon to see connection information for the destination server
-5. Transfer cooldowns prevent spam (5 seconds by default)
+4. Players right-click a servergate beacon to see a fullscreen transfer screen with destination info
+5. Players disconnect and reconnect using the provided server address
+6. Transfer cooldowns prevent spam (5 seconds by default)
 
 ## Setup
 
@@ -58,7 +60,17 @@ worldgate.db_user = worldgate
 worldgate.db_password = your_secure_password
 ```
 
-### 4. Linking Gates
+### 4. Transfer Screen Image (Optional)
+
+For the best player experience, add a custom transfer screen background:
+
+1. Place an image named `worldgate_transfer.png` in the `textures/` directory
+2. Recommended size: 1920x1080 or larger
+3. Theme: Portal, tunnel, or dimensional transfer imagery
+
+See [TRANSFER_SCREEN.md](TRANSFER_SCREEN.md) for detailed setup and customization.
+
+### 5. Linking Gates
 
 Gates can be linked using the Lua API:
 

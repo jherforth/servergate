@@ -326,10 +326,13 @@ function worldgate.initiate_transfer(beacon_pos, player)
       local dest_server = server_data[1]
       local player_name = player:get_player_name()
 
-      minetest.chat_send_player(player_name,
-        "Connect to destination: " .. dest_server.name .. " at " .. dest_server.url)
-      minetest.chat_send_player(player_name,
-        "Copy this command: /connect " .. dest_server.url)
+      -- Show the transfer screen with the portal image
+      worldgate.transfer_screen.show(
+        player,
+        dest_server.name,
+        dest_server.url,
+        "Gate " .. gate_id:sub(1, 8)
+      )
 
       worldgate.server_api.log_transfer(player_name, gate_id, dest_gate_id, dest_server_id, true)
     end)

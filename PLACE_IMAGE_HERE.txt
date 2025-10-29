@@ -1,0 +1,30 @@
+═══════════════════════════════════════════════════════════
+  TRANSFER SCREEN IMAGE SETUP
+═══════════════════════════════════════════════════════════
+
+To complete the transfer screen setup:
+
+1. Rename your image file:
+   transfer.jpeg → worldgate_transfer.png
+
+2. Place it in this location:
+   worldgate/textures/worldgate_transfer.png
+
+3. The final path should be:
+   /path/to/minetest/mods/worldgate/textures/worldgate_transfer.png
+
+4. Restart your Minetest/Luanti server
+
+THAT'S IT!
+
+When players right-click a linked servergate beacon, they'll see
+your custom portal image as a beautiful fullscreen background.
+
+═══════════════════════════════════════════════════════════
+
+For more customization options, see:
+- TRANSFER_SCREEN.md - Full documentation
+- textures/README.txt - Image requirements
+- src/transfer_screen.lua - Code customization
+
+═══════════════════════════════════════════════════════════
