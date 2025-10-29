@@ -8,11 +8,11 @@ This mod has been designed to coexist peacefully with the original worldgate mod
 
 **Servergate Beacons (this mod):**
 - Node names: `worldgate:servergate_beacon` and `worldgate:servergate_beacon_off`
-- Color: Cyan/Light Blue (`#00FFFF`)
+- Color: Red (`#FF0000` active, `#330000` inactive)
 - Purpose: Cross-server player transfers
 - Right-click shows destination server URL
 
-**Telemosaic Beacons (telemosaic mod):**
+**Worldgate/Telemosaic Beacons (telemosaic mod):**
 - Node names: `telemosaic:beacon` and `telemosaic:beacon_off`
 - Color: Blue (`#4444FF`)
 - Purpose: Local teleportation within the same server
@@ -42,8 +42,8 @@ You can have both systems in your world:
 2. **Worldgates with Servergate Beacons**: Cross-server transfers
 
 Players will know which is which by the color:
-- **Blue beacons** = Local teleport
-- **Cyan beacons** = Server transfer
+- **Blue beacons** = Local teleport (telemosaic)
+- **Red beacons** = Server transfer (servergate)
 
 ### Migration from Pure Worldgate/Telemosaic
 
@@ -51,14 +51,14 @@ If you're upgrading a world that used the original worldgate mod:
 
 1. The worldgate structures will remain
 2. If telemosaic mod is installed, the blue beacons will continue working for local teleportation
-3. New worldgate structures will generate with cyan servergate beacons
+3. New worldgate structures will generate with red servergate beacons
 4. You can manually replace old beacons with servergate beacons if desired
 
 ### Commands
 
 All admin commands work specifically with servergate beacons:
 
-- `/worldgate_info` - Only works when looking at servergate beacons (cyan)
+- `/worldgate_info` - Only works when looking at servergate beacons (red)
 - `/worldgate_link` - Only links servergate beacons
 - `/worldgate_list` - Lists servergates on this server
 

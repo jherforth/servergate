@@ -38,7 +38,7 @@ end
 minetest.register_node("worldgate:servergate_beacon", {
   description = "Servergate Beacon",
   tiles = {
-    "default_stone_brick.png^[colorize:#00FFFF:120",
+    "default_stone_brick.png^[colorize:#FF0000:120",
   },
   groups = {
     cracky = 3,
@@ -60,7 +60,7 @@ minetest.register_node("worldgate:servergate_beacon", {
 minetest.register_node("worldgate:servergate_beacon_off", {
   description = "Inactive Servergate Beacon",
   tiles = {
-    "default_stone_brick.png^[colorize:#444444:120",
+    "default_stone_brick.png^[colorize:#330000:120",
   },
   groups = {
     cracky = 3,

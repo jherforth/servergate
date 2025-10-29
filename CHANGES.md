@@ -38,7 +38,7 @@ This mod has been transformed from a local teleportation system (based on Telemo
    - No longer requires the Telemosaic mod
    - Created new servergate beacon nodes: `worldgate:servergate_beacon` and `worldgate:servergate_beacon_off`
    - Beacons now trigger server transfers instead of local teleportation
-   - Servergate beacons are cyan/light blue to distinguish from telemosaic beacons (blue)
+   - Servergate beacons are red to distinguish from worldgate/telemosaic beacons (blue)
    - Both mods can now coexist in the same world without conflicts
 
 2. **Added Database Synchronization**
