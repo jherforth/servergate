@@ -1,5 +1,46 @@
 # Compatibility Notes
 
+## ⚠️ Player Inventory Transfer Limitation
+
+**Player inventories do NOT transfer between servers.**
+
+When a player uses a servergate to transfer from one server to another:
+
+### What Transfers:
+- ✅ Player username
+- ✅ Player authentication (if shared auth database)
+- ✅ Player privileges (if shared auth database)
+
+### What Does NOT Transfer:
+- ❌ All items in inventory
+- ❌ Armor items (helmet, chestplate, leggings, boots)
+- ❌ Wielded item (held in hand)
+- ❌ Health points
+- ❌ Breath/oxygen level
+- ❌ Experience/skill points
+- ❌ Quest progress
+- ❌ Player metadata from mods
+- ❌ Protected areas
+- ❌ Player's home/spawn points
+
+### Why This Limitation Exists:
+
+1. **No Standardized Protocol**: Minetest/Luanti has no built-in cross-server player transfer system
+2. **Item Incompatibility**: Different servers may run different games (Minetest Game, MineClone2, etc.) with incompatible item names
+3. **Security Concerns**: Transferring inventory would require complex validation to prevent exploits
+4. **Mod-Specific Data**: Items can have custom metadata that wouldn't transfer correctly
+
+### Design Recommendations:
+
+- **Fresh Start Approach**: Treat each server as a separate adventure
+- **Identical Game Setup**: Use the same game + mods across all servers for consistency (items still won't transfer, but gameplay will be familiar)
+- **Spawn Kits**: Give players starter items when they join
+- **Communication**: Clearly inform players that they'll lose inventory when transferring
+
+For detailed information, see the full explanation in [API.md](API.md) and [QUICKSTART.md](QUICKSTART.md).
+
+---
+
 ## Coexistence with Original Worldgate/Telemosaic Mods
 
 This mod has been designed to coexist peacefully with the original worldgate mod and/or telemosaic mod if both are installed in the same world.

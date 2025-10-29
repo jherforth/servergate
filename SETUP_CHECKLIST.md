@@ -4,12 +4,24 @@ Use this checklist to ensure your multi-server worldgate network is configured c
 
 ---
 
+## ⚠️ Important Limitation
+
+**Player inventories do NOT transfer between servers.** When players use a worldgate to transfer:
+- ✅ Player account/authentication transfers
+- ❌ All items in inventory are lost
+- ❌ Armor and wielded items are lost
+
+This is a technical limitation as servers may run different games/mods. Configure your gameplay expectations accordingly!
+
+---
+
 ## 📋 Pre-Installation
 
 - [ ] I have 2 or more Minetest/Luanti servers ready
 - [ ] I have admin privileges on all servers
 - [ ] I understand I need MySQL/MariaDB for multi-server setup
 - [ ] I've read [MYSQL_SETUP_FOR_BEGINNERS.md](MYSQL_SETUP_FOR_BEGINNERS.md) (if new to databases)
+- [ ] I understand that player inventories will NOT transfer between servers
 
 ---
 

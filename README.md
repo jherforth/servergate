@@ -3,6 +3,8 @@ Worldgate Server Connector
 
 A Luanti/Minetest mod that generates ancient worldgate structures throughout your world and enables server-to-server player transfers. Worldgates are synchronized across multiple servers via MariaDB/MySQL, allowing players to travel between different game servers through the gate network.
 
+**Built upon [EmptyStar's worldgate mod](https://github.com/mt-empty/worldgate)** - This mod extends the excellent foundation provided by EmptyStar's worldgate with multi-server connectivity, database synchronization, and cross-server transfer capabilities.
+
 ## Features
 
 - **Automatic Gate Generation**: Worldgates spawn throughout the world with various architectural styles
@@ -114,6 +116,22 @@ Where:
 - `worldgate.ymax` - Maximum Y coordinate for gates (default: 29900)
 - `worldgate.beaconglow` - Make beacons emit light (default: true)
 
+## Important Limitations
+
+**⚠️ Inventory Does Not Transfer**
+
+Player inventories do **not** transfer between servers. When players transfer through a worldgate:
+- **Player keeps:** Their username, authentication
+- **Player loses:** All inventory items, armor, wielded items
+
+This is a technical limitation because:
+- Servers may run different games (Minetest Game, MineClone2, etc.)
+- Item names and properties differ between games
+- No standardized inventory transfer protocol exists
+- Security concerns with cross-server item validation
+
+**Recommendation:** Use worldgates as "starting fresh" portals or configure your servers to run identical games/mods if you need consistent gameplay.
+
 ## Notes
 
 - Worldgates only generate in unexplored areas
@@ -127,6 +145,7 @@ Where:
 - **[SETUP_CHECKLIST.md](SETUP_CHECKLIST.md)** - Complete setup verification
 - **[MYSQL_SETUP_FOR_BEGINNERS.md](MYSQL_SETUP_FOR_BEGINNERS.md)** - Database setup guide
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture and diagrams
+- **[COMPATIBILITY.md](COMPATIBILITY.md)** - Inventory limitations and compatibility notes
 - **[TRANSFER_SCREEN.md](TRANSFER_SCREEN.md)** - Customize transfer interface
 - **[API.md](API.md)** - Full API reference
 - **[DATABASE_QUERIES.md](DATABASE_QUERIES.md)** - Advanced database queries
@@ -140,3 +159,14 @@ The mod creates three database tables:
 - `transfer_logs` - History of player transfers
 
 Each server maintains a heartbeat every 60 seconds to indicate it's active.
+
+---
+
+## Credits & Acknowledgements
+
+**Original Mod:** [EmptyStar's worldgate](https://github.com/mt-empty/worldgate)
+This server connector variant was built upon EmptyStar's excellent worldgate mod, which provides the beautiful gate structures, mapgen integration, and core worldgate functionality. All credit for the original concept, schematics, and single-server worldgate implementation goes to EmptyStar.
+
+**Development Platform:** This mod was developed using [Bolt.new](https://bolt.new), an AI-powered coding platform that accelerates development through intelligent code assistance.
+
+**License:** See LICENSE file for details.

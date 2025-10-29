@@ -25,6 +25,8 @@ You want multiple Minetest servers to share worldgate data so players can transf
                         └───────────────┘
 ```
 
+**⚠️ IMPORTANT LIMITATION:** Player inventories do NOT transfer between servers! Players will lose all items when transferring through worldgates. This is because different servers may run different games/mods with incompatible items.
+
 ---
 
 ## ⚠️ Important: Where to Host the Database

@@ -142,6 +142,8 @@ On Server Beta, link back to Alpha:
    ```
 3. Players can copy/paste that command to switch servers
 
+**⚠️ IMPORTANT:** Player inventories do NOT transfer between servers. Players will lose all items, armor, and wielded equipment when transferring. This is a technical limitation as servers may run different games/mods with incompatible items.
+
 ## Admin Commands
 
 - `/worldgate_info` - Get info about the gate you're looking at
