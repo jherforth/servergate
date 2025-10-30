@@ -1,22 +1,51 @@
 # Server identification name
+# This name appears to players when they use worldgates
+# Make it unique for each server in your network
+# Examples: "Fantasy Server", "Desert World", "Space Station Alpha"
 worldgate.server_name (Server Name) string My Server
 
 # Server URL that players connect to
+# This is the connection string shown to players for transferring servers
+# Local server examples:
+#   minetest://localhost:30000
+#   localhost:30000
+# Public server examples:
+#   minetest://play.example.com:30000
+#   minetest://192.168.1.50:30000
+#   play.example.com:30000
 worldgate.server_url (Server URL) string minetest://localhost:30000
 
 # PostgreSQL database host
+# IP address or hostname of your PostgreSQL server
+# Examples:
+#   localhost (if database is on same machine)
+#   192.168.1.100 (private network IP)
+#   10.0.0.50 (another private network IP)
+#   db.example.com (hostname)
 worldgate.db_host (Database Host) string localhost
 
 # PostgreSQL database port
+# Default PostgreSQL port is 5432
+# Only change if you configured PostgreSQL on a different port
 worldgate.db_port (Database Port) int 5432 1 65535
 
 # Database name
+# The name of the PostgreSQL database created for worldgate
+# Default: worldgate
+# All servers in your network should use the SAME database name
 worldgate.db_name (Database Name) string worldgate
 
 # Database user
+# The PostgreSQL username for worldgate connections
+# Default: worldgate
+# All servers in your network should use the SAME database user
 worldgate.db_user (Database User) string worldgate
 
 # Database password
+# The password for the worldgate PostgreSQL user
+# All servers in your network should use the SAME password
+# IMPORTANT: Keep this secure and never share publicly
+# Example: MySecureP@ssw0rd2024
 worldgate.db_password (Database Password) string
 
 # Enable mapgen? Unset this to prevent all worldgates from generating.
