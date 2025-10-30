@@ -2,6 +2,11 @@
 -- Overrides for Telemosaic settings
 --
 
+-- Only apply overrides if telemosaic mod is available
+if not telemosaic then
+  return
+end
+
 -- Give extenders a lot more range
 if servergate.settings.superextenders then
   -- Global extender values

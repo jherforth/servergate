@@ -2,6 +2,11 @@
 -- Servergate linking functions
 --
 
+-- Only apply if telemosaic mod is available
+if not telemosaic then
+  return
+end
+
 -- Telemosaic location hashing and unhashing functions
 local function hash_pos(pos)
   return math.floor(pos.x + 0.5)..':'..
