@@ -177,3 +177,64 @@ minetest.register_chatcommand("worldgate_list", {
     return true, "Fetching gate list from database..."
   end,
 })
+
+-- Command to test database connection
+minetest.register_chatcommand("worldgate_dbtest", {
+  params = "",
+  description = "Test the connection to the worldgate database",
+  privs = {server = true},
+  func = function(name, param)
+    local output = "Database Connection Test\n"
+    output = output .. "========================\n"
+
+    -- Check if database module exists
+    if not servergate.db then
+      return false, "Database module not loaded"
+    end
+
+    -- Check availability flag
+    output = output .. "Database Available: " .. (servergate.db.available and "YES" or "NO") .. "\n"
+
+    if not servergate.db.available then
+      output = output .. "\nDatabase is not available. Check:\n"
+      output = output .. "1. PostgreSQL is installed and running\n"
+      output = output .. "2. Database credentials in world.mt are correct\n"
+      output = output .. "3. Network connectivity to database server\n"
+      return false, output
+    end
+
+    -- Check server registration
+    if servergate.server_id then
+      output = output .. "Server ID: " .. servergate.server_id:sub(1, 8) .. "...\n"
+      output = output .. "Server Name: " .. (servergate.settings.server_name or "Unknown") .. "\n"
+    else
+      output = output .. "Server ID: NOT REGISTERED\n"
+    end
+
+    -- Test a simple query
+    output = output .. "\nTesting database query...\n"
+
+    servergate.db.query("SELECT COUNT(*) as count FROM servers;", function(success, result)
+      if success and result and #result > 0 then
+        local server_count = result[1].count
+        minetest.chat_send_player(name, output .. "Servers in database: " .. server_count)
+
+        -- Get gate count
+        servergate.db.query("SELECT COUNT(*) as count FROM worldgates;", function(gate_success, gate_result)
+          if gate_success and gate_result and #gate_result > 0 then
+            local gate_count = gate_result[1].count
+            minetest.chat_send_player(name, "Total gates in database: " .. gate_count)
+            minetest.chat_send_player(name, "\n✓ Database connection successful!")
+          else
+            minetest.chat_send_player(name, "Warning: Could not query worldgates table")
+          end
+        end)
+      else
+        minetest.chat_send_player(name, output .. "✗ Query failed: " .. tostring(result))
+        minetest.chat_send_player(name, "\nCheck server logs for details")
+      end
+    end)
+
+    return true, "Running database tests..."
+  end,
+})
