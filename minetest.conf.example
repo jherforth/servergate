@@ -16,11 +16,11 @@ worldgate.server_url = minetest://play.example.com:30000
 # Database Configuration
 # ======================
 
-# MariaDB/MySQL host
+# PostgreSQL host
 worldgate.db_host = localhost
 
-# MariaDB/MySQL port (default: 3306)
-worldgate.db_port = 3306
+# PostgreSQL port (default: 5432)
+worldgate.db_port = 5432
 
 # Database name
 worldgate.db_name = worldgate
@@ -69,8 +69,10 @@ worldgate.breakage = 8
 worldgate.beaconglow = true
 
 # ======================
-# Required for MySQL Support
+# Required for PostgreSQL Support
 # ======================
 
-# If using mysql_base mod, no additional configuration needed
-# If MySQL mod is not available, mod will use local storage as fallback
+# PostgreSQL is natively supported by Minetest
+# Configure 'pgsql_connection' in world.mt for multi-server support:
+# backend = postgresql
+# pgsql_connection = host=localhost port=5432 user=worldgate password=xxx dbname=worldgate

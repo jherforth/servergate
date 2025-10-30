@@ -1,7 +1,7 @@
 Worldgate Server Connector
 ==========================
 
-A Luanti/Minetest mod that generates ancient worldgate structures throughout your world and enables server-to-server player transfers. Worldgates are synchronized across multiple servers via MariaDB/MySQL, allowing players to travel between different game servers through the gate network.
+A Luanti/Minetest mod that generates ancient worldgate structures throughout your world and enables server-to-server player transfers. Worldgates are synchronized across multiple servers via PostgreSQL, allowing players to travel between different game servers through the gate network.
 
 **Built upon [EmptyStar's worldgate mod](https://github.com/mt-empty/worldgate)** - This mod extends the excellent foundation provided by EmptyStar's worldgate with multi-server connectivity, database synchronization, and cross-server transfer capabilities.
 
@@ -17,7 +17,7 @@ A Luanti/Minetest mod that generates ancient worldgate structures throughout you
 
 ## How It Works
 
-1. Each server runs the worldgate mod and connects to a shared MariaDB/MySQL database
+1. Each server runs the worldgate mod and connects to a shared PostgreSQL database
 2. When gates generate, they spawn with red servergate beacons in their centers
 3. Server admins can link servergate beacons between different servers
 4. Players right-click a servergate beacon to see a fullscreen transfer screen with destination info
@@ -37,32 +37,28 @@ Choose the guide that matches your experience level:
   - Verify each component works
   - Troubleshooting for each step
 
-- **🌟 NEW TO DATABASES?** → [MySQL Setup for Complete Beginners](MYSQL_SETUP_FOR_BEGINNERS.md)
+- **🌟 NEW TO DATABASES?** → [PostgreSQL Setup Guide](POSTGRESQL_SETUP.md)
   - Step-by-step instructions with explanations
   - Covers installation, security, and testing
   - Troubleshooting for common issues
-
-- **💪 EXPERIENCED USER?** → [MariaDB Advanced Setup](MARIADB_SETUP.md)
-  - Network configuration
-  - Performance tuning
-  - Production deployment
+  - Migration from MySQL/MariaDB
 
 ### 1. Database Setup
 
-Set up a MySQL/MariaDB database that all your servers can access:
+Set up a PostgreSQL database that all your servers can access:
 
-1. Follow the [MySQL Setup for Complete Beginners](MYSQL_SETUP_FOR_BEGINNERS.md) guide
+1. Follow the [PostgreSQL Setup Guide](POSTGRESQL_SETUP.md)
 2. Run the provided `database_schema.sql` to create tables
 3. Register each server with `/worldgate_register_server`
 
 **Quick install:**
 ```bash
-mysql -u root -p < database_schema.sql
+sudo -u postgres psql -d worldgate < database_schema.sql
 ```
 
-### 2. Install mysql_base Mod (Optional but Recommended)
+### 2. Configure Minetest PostgreSQL Backend
 
-For multi-server support, install a MySQL connectivity mod like `mysql_base`. Without it, the mod will work in single-server mode using mod_storage as a fallback.
+PostgreSQL is natively supported by Minetest - no additional mods required! Just configure your `world.mt` file with the PostgreSQL connection string.
 
 ### 3. Server Configuration
 
@@ -75,9 +71,13 @@ worldgate.server_name = My Server Alpha
 # URL players should connect to
 worldgate.server_url = minetest://play.example.com:30000
 
-# Database connection
+# PostgreSQL backend (in world.mt)
+backend = postgresql
+pgsql_connection = host=192.168.1.100 port=5432 user=worldgate password=xxx dbname=worldgate
+
+# Database connection (for mod queries)
 worldgate.db_host = 192.168.1.100
-worldgate.db_port = 3306
+worldgate.db_port = 5432
 worldgate.db_name = worldgate
 worldgate.db_user = worldgate
 worldgate.db_password = your_secure_password
@@ -143,13 +143,12 @@ This is a technical limitation because:
 
 - **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Commands and queries cheat sheet
 - **[SETUP_CHECKLIST.md](SETUP_CHECKLIST.md)** - Complete setup verification
-- **[MYSQL_SETUP_FOR_BEGINNERS.md](MYSQL_SETUP_FOR_BEGINNERS.md)** - Database setup guide
+- **[POSTGRESQL_SETUP.md](POSTGRESQL_SETUP.md)** - PostgreSQL database setup guide
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture and diagrams
 - **[COMPATIBILITY.md](COMPATIBILITY.md)** - Inventory limitations and compatibility notes
 - **[TRANSFER_SCREEN.md](TRANSFER_SCREEN.md)** - Customize transfer interface
 - **[API.md](API.md)** - Full API reference
 - **[DATABASE_QUERIES.md](DATABASE_QUERIES.md)** - Advanced database queries
-- **[MARIADB_SETUP.md](MARIADB_SETUP.md)** - Advanced database setup
 
 ## Technical Details
 

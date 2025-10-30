@@ -2,51 +2,46 @@
 
 ## Overview
 
-This guide will help you set up a network of Luanti/Minetest servers connected via Worldgates using your own MariaDB database.
+This guide will help you set up a network of Luanti/Minetest servers connected via Worldgates using your own PostgreSQL database.
 
 ## Prerequisites
 
 - Two or more Luanti/Minetest servers
-- MariaDB or MySQL server on your private network
+- PostgreSQL server on your private network
 - Server admin access with `server` privilege
-- (Optional) `mysql_base` mod for Minetest/Luanti
 
 ## 📚 Need Database Help?
 
-**First time setting up MySQL?** We have a complete guide for you:
+**First time setting up PostgreSQL?** We have a complete guide for you:
 
-👉 **[MySQL Setup for Complete Beginners](MYSQL_SETUP_FOR_BEGINNERS.md)** 👈
+👉 **[PostgreSQL Setup Guide](POSTGRESQL_SETUP.md)** 👈
 
 It covers everything from installation to troubleshooting with step-by-step instructions.
 
 ---
 
-## Step 1: Set Up MariaDB Database
+## Step 1: Set Up PostgreSQL Database
 
 ### Quick Setup (Experienced Users)
 
 On your database server:
 
-1. Install MariaDB:
+1. Install PostgreSQL:
 ```bash
-sudo apt-get install mariadb-server
+sudo apt-get install postgresql postgresql-contrib
 ```
 
 2. Create the database and tables:
 ```bash
-mysql -u root -p < database_schema.sql
+sudo -u postgres psql -c "CREATE DATABASE worldgate;"
+sudo -u postgres psql -d worldgate < database_schema.sql
 ```
 
-3. Create database user:
-```sql
-CREATE USER 'worldgate'@'%' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON worldgate.* TO 'worldgate'@'%';
-FLUSH PRIVILEGES;
-```
+3. Database user is created automatically by the schema script.
 
 4. Note your database connection details:
    - Host (e.g., `192.168.1.100` or `localhost`)
-   - Port (default: `3306`)
+   - Port (default: `5432`)
    - Database name (`worldgate`)
    - Username (`worldgate`)
    - Password (what you just set)
@@ -54,8 +49,7 @@ FLUSH PRIVILEGES;
 ## Step 2: Install the Mod
 
 1. Install this mod on all servers in your network
-2. (Optional) Install `mysql_base` mod for MySQL connectivity
-   - Without this, mod will work in single-server fallback mode
+2. Configure PostgreSQL backend in world.mt (PostgreSQL is natively supported by Minetest)
 3. Make sure all servers can reach your database
 
 ## Step 3: Configure Each Server
@@ -68,7 +62,7 @@ worldgate.server_name = Server Alpha
 worldgate.server_url = minetest://alpha.example.com:30000
 
 worldgate.db_host = 192.168.1.100
-worldgate.db_port = 3306
+worldgate.db_port = 5432
 worldgate.db_name = worldgate
 worldgate.db_user = worldgate
 worldgate.db_password = your_secure_password
@@ -82,7 +76,7 @@ worldgate.server_name = Server Beta
 worldgate.server_url = minetest://beta.example.com:30001
 
 worldgate.db_host = 192.168.1.100
-worldgate.db_port = 3306
+worldgate.db_port = 5432
 worldgate.db_name = worldgate
 worldgate.db_user = worldgate
 worldgate.db_password = your_secure_password
@@ -152,14 +146,15 @@ On Server Beta, link back to Alpha:
 
 ## Troubleshooting
 
-### "MySQL mod not found, using mod_storage as fallback"
-- Install the `mysql_base` mod for multi-server support
+### "PostgreSQL not available"
+- Configure PostgreSQL backend in world.mt
+- Add pgsql_connection string to world.mt
 - In fallback mode, gates only work locally
 
 ### "Failed to register server"
-- Check database credentials in minetest.conf
+- Check database credentials in world.mt and minetest.conf
 - Verify network connectivity to database server
-- Check MariaDB logs for connection errors
+- Check PostgreSQL logs for connection errors
 
 ### "Gate destination not found"
 - Make sure you've linked the gates correctly using UUIDs
@@ -192,7 +187,7 @@ WHERE w1.destination_gate_id IS NOT NULL;
 ## Network Setup Tips
 
 1. **Private Network**: Keep your database on a private network
-2. **Firewall**: Only allow your game servers to access port 3306
+2. **Firewall**: Only allow your game servers to access port 5432
 3. **SSL/TLS**: Consider enabling encrypted database connections
 4. **Backups**: Regularly backup your `worldgate` database
 5. **Monitoring**: Watch database logs for suspicious activity

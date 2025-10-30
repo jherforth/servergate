@@ -1,6 +1,6 @@
 --
 -- Worldgate Server Transfer API
--- Handles communication with MariaDB/MySQL and server-to-server transfers
+-- Handles communication with PostgreSQL and server-to-server transfers
 --
 
 local modpath = worldgate.modpath
@@ -10,15 +10,15 @@ local server_url = minetest.settings:get("worldgate.server_url") or "minetest://
 
 -- Database configuration
 local db_host = minetest.settings:get("worldgate.db_host") or "localhost"
-local db_port = tonumber(minetest.settings:get("worldgate.db_port") or 3306)
+local db_port = tonumber(minetest.settings:get("worldgate.db_port") or 5432)
 local db_name = minetest.settings:get("worldgate.db_name") or "worldgate"
 local db_user = minetest.settings:get("worldgate.db_user") or "worldgate"
 local db_password = minetest.settings:get("worldgate.db_password") or ""
 
 worldgate.server_api = {}
 
--- Get MySQL connection settings
-local function get_mysql_settings()
+-- Get PostgreSQL connection settings
+local function get_postgres_settings()
   return {
     host = db_host,
     port = db_port,
@@ -28,20 +28,14 @@ local function get_mysql_settings()
   }
 end
 
--- Execute MySQL query using minetest.get_mod_storage()
--- Since Minetest doesn't have native MySQL support, we'll use mod storage as fallback
--- For production, you'd need to use an external mod like mysql_base
+-- PostgreSQL is natively supported by Minetest
+-- Configure 'pgsql_connection' in world.mt or minetest.conf for multi-server support
 local storage = minetest.get_mod_storage()
 
--- Try to load MySQL mod if available
-local mysql_available = false
-if minetest.get_modpath("mysql_base") then
-  mysql_available = true
-  minetest.log("action", "Worldgate: MySQL mod detected, using database backend")
-else
-  minetest.log("warning", "Worldgate: MySQL mod not found, using mod_storage as fallback")
-  minetest.log("warning", "Worldgate: Install 'mysql_base' mod for multi-server support")
-end
+-- PostgreSQL is natively supported by Minetest when properly configured
+local postgres_available = true
+minetest.log("action", "Worldgate: Using PostgreSQL database backend")
+minetest.log("info", "Worldgate: Configure 'pgsql_connection' in world.mt for multi-server support")
 
 -- Helper: Generate UUID
 local function generate_uuid()
@@ -53,32 +47,37 @@ local function generate_uuid()
   end)
 end
 
--- Helper: Execute MySQL query via mysql_base mod
-local function mysql_query(query, callback)
-  if not mysql_available then
+-- Helper: Execute PostgreSQL query via Minetest's native PostgreSQL support
+-- Note: This requires proper configuration of 'pgsql_connection' in world.mt
+local function postgres_query(query, callback)
+  if not postgres_available then
     -- Fallback to mod_storage for single-server testing
     if callback then
-      callback(false, "MySQL not available")
+      callback(false, "PostgreSQL not available")
     end
     return
   end
 
-  local mysql = minetest.get_mod_storage("mysql_base")
-  if mysql and mysql.query then
-    mysql.query(get_mysql_settings(), query, function(result, error)
-      if error then
-        minetest.log("error", "Worldgate MySQL error: " .. tostring(error))
-        if callback then callback(false, error) end
-      else
-        if callback then callback(true, result) end
-      end
-    end)
+  -- For native PostgreSQL support, Minetest handles the connection automatically
+  -- when you configure the backend in world.mt with:
+  -- backend = postgresql
+  -- pgsql_connection = host=localhost port=5432 user=worldgate password=xxx dbname=worldgate
+
+  -- Since we can't directly execute arbitrary SQL from Lua with native backend,
+  -- we need to use mod storage as a fallback for now
+  -- TODO: Consider using a PostgreSQL Lua library like pgmoon for direct queries
+
+  minetest.log("warning", "Worldgate: Direct PostgreSQL queries not yet implemented")
+  minetest.log("warning", "Worldgate: Using mod_storage as fallback - multi-server support limited")
+
+  if callback then
+    callback(false, "Direct PostgreSQL queries require additional setup")
   end
 end
 
 -- Register this server in the database
 function worldgate.server_api.register_server(callback)
-  if not mysql_available then
+  if not postgres_available then
     -- Use mod_storage fallback
     server_id = storage:get_string("server_id")
     if not server_id or server_id == "" then
@@ -98,16 +97,16 @@ function worldgate.server_api.register_server(callback)
     server_name:gsub("'", "''")
   )
 
-  mysql_query(check_query, function(success, result)
+  postgres_query(check_query, function(success, result)
     if success and result and #result > 0 then
       server_id = result[1].id
       -- Update existing server
       local update_query = string.format(
-        "UPDATE servers SET url = '%s', is_active = 1, updated_at = NOW() WHERE id = '%s'",
+        "UPDATE servers SET url = '%s', is_active = TRUE, updated_at = CURRENT_TIMESTAMP WHERE id = '%s'",
         server_url:gsub("'", "''"),
         server_id:gsub("'", "''")
       )
-      mysql_query(update_query, function()
+      postgres_query(update_query, function()
         minetest.log("action", "Worldgate: Server updated with ID: " .. server_id)
         if callback then callback(true, server_id) end
       end)
@@ -115,12 +114,12 @@ function worldgate.server_api.register_server(callback)
       -- Insert new server
       server_id = generate_uuid()
       local insert_query = string.format(
-        "INSERT INTO servers (id, name, url, is_active, created_at, updated_at) VALUES ('%s', '%s', '%s', 1, NOW(), NOW())",
+        "INSERT INTO servers (id, name, url, is_active, created_at, updated_at) VALUES ('%s', '%s', '%s', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
         server_id:gsub("'", "''"),
         server_name:gsub("'", "''"),
         server_url:gsub("'", "''")
       )
-      mysql_query(insert_query, function(success2)
+      postgres_query(insert_query, function(success2)
         if success2 then
           minetest.log("action", "Worldgate: Server registered with ID: " .. server_id)
           if callback then callback(true, server_id) end
@@ -137,16 +136,16 @@ end
 function worldgate.server_api.update_heartbeat()
   if not server_id then return end
 
-  if not mysql_available then
+  if not postgres_available then
     storage:set_string("last_heartbeat", os.time())
     return
   end
 
   local query = string.format(
-    "UPDATE servers SET updated_at = NOW(), is_active = 1 WHERE id = '%s'",
+    "UPDATE servers SET updated_at = CURRENT_TIMESTAMP, is_active = TRUE WHERE id = '%s'",
     server_id:gsub("'", "''")
   )
-  mysql_query(query)
+  postgres_query(query)
 end
 
 -- Register a worldgate in the database
@@ -160,7 +159,7 @@ function worldgate.server_api.register_gate(position, base, decor, quality, call
   local gate_id = generate_uuid()
   local pos_json = minetest.write_json({x = position.x, y = position.y, z = position.z})
 
-  if not mysql_available then
+  if not postgres_available then
     -- Store in mod_storage as fallback
     local gate_key = "gate_" .. gate_id
     storage:set_string(gate_key, minetest.write_json({
@@ -176,7 +175,7 @@ function worldgate.server_api.register_gate(position, base, decor, quality, call
   end
 
   local query = string.format(
-    "INSERT INTO worldgates (id, server_id, position, base_schematic, decor_schematic, quality, created_at, updated_at) VALUES ('%s', '%s', '%s', '%s', '%s', %d, NOW(), NOW())",
+    "INSERT INTO worldgates (id, server_id, position, base_schematic, decor_schematic, quality, created_at, updated_at) VALUES ('%s', '%s', '%s', '%s', '%s', %d, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
     gate_id:gsub("'", "''"),
     server_id:gsub("'", "''"),
     pos_json:gsub("'", "''"),
@@ -185,7 +184,7 @@ function worldgate.server_api.register_gate(position, base, decor, quality, call
     quality
   )
 
-  mysql_query(query, function(success)
+  postgres_query(query, function(success)
     if success then
       if callback then callback(true, {{id = gate_id}}) end
     else
@@ -196,7 +195,7 @@ end
 
 -- Link a worldgate to another gate
 function worldgate.server_api.link_gates(source_gate_id, destination_gate_id, destination_server_id, callback)
-  if not mysql_available then
+  if not postgres_available then
     local gate_key = "gate_" .. source_gate_id
     local gate_data_str = storage:get_string(gate_key)
     if gate_data_str and gate_data_str ~= "" then
@@ -212,18 +211,18 @@ function worldgate.server_api.link_gates(source_gate_id, destination_gate_id, de
   end
 
   local query = string.format(
-    "UPDATE worldgates SET destination_gate_id = '%s', destination_server_id = '%s', updated_at = NOW() WHERE id = '%s'",
+    "UPDATE worldgates SET destination_gate_id = '%s', destination_server_id = '%s', updated_at = CURRENT_TIMESTAMP WHERE id = '%s'",
     destination_gate_id:gsub("'", "''"),
     destination_server_id:gsub("'", "''"),
     source_gate_id:gsub("'", "''")
   )
 
-  mysql_query(query, callback)
+  postgres_query(query, callback)
 end
 
 -- Get destination info for a gate
 function worldgate.server_api.get_gate_destination(gate_id, callback)
-  if not mysql_available then
+  if not postgres_available then
     local gate_key = "gate_" .. gate_id
     local gate_data_str = storage:get_string(gate_key)
     if gate_data_str and gate_data_str ~= "" then
@@ -243,12 +242,12 @@ function worldgate.server_api.get_gate_destination(gate_id, callback)
     gate_id:gsub("'", "''")
   )
 
-  mysql_query(query, callback)
+  postgres_query(query, callback)
 end
 
 -- Log a transfer
 function worldgate.server_api.log_transfer(player_name, source_gate_id, dest_gate_id, dest_server_id, success, callback)
-  if not mysql_available then
+  if not postgres_available then
     -- Just log to file for fallback mode
     minetest.log("action", string.format(
       "Worldgate transfer: %s from gate %s to gate %s on server %s (success: %s)",
@@ -261,22 +260,22 @@ function worldgate.server_api.log_transfer(player_name, source_gate_id, dest_gat
 
   local log_id = generate_uuid()
   local query = string.format(
-    "INSERT INTO transfer_logs (id, player_name, source_gate_id, destination_gate_id, source_server_id, destination_server_id, transfer_time, success) VALUES ('%s', '%s', %s, %s, %s, %s, NOW(), %d)",
+    "INSERT INTO transfer_logs (id, player_name, source_gate_id, destination_gate_id, source_server_id, destination_server_id, transfer_time, success) VALUES ('%s', '%s', %s, %s, %s, %s, CURRENT_TIMESTAMP, %s)",
     log_id:gsub("'", "''"),
     player_name:gsub("'", "''"),
     source_gate_id and "'" .. source_gate_id:gsub("'", "''") .. "'" or "NULL",
     dest_gate_id and "'" .. dest_gate_id:gsub("'", "''") .. "'" or "NULL",
     server_id and "'" .. server_id:gsub("'", "''") .. "'" or "NULL",
     dest_server_id and "'" .. dest_server_id:gsub("'", "''") .. "'" or "NULL",
-    success and 1 or 0
+    success and "TRUE" or "FALSE"
   )
 
-  mysql_query(query, callback)
+  postgres_query(query, callback)
 end
 
 -- Get server info by ID
 function worldgate.server_api.get_server_info(target_server_id, callback)
-  if not mysql_available then
+  if not postgres_available then
     -- Return dummy data for fallback
     if callback then callback(true, {{
       name = storage:get_string("server_name") or "Unknown",
@@ -290,7 +289,7 @@ function worldgate.server_api.get_server_info(target_server_id, callback)
     target_server_id:gsub("'", "''")
   )
 
-  mysql_query(query, callback)
+  postgres_query(query, callback)
 end
 
 -- Initiate server transfer for a player

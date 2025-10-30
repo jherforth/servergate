@@ -19,25 +19,24 @@ This is a technical limitation as servers may run different games/mods. Configur
 
 - [ ] I have 2 or more Minetest/Luanti servers ready
 - [ ] I have admin privileges on all servers
-- [ ] I understand I need MySQL/MariaDB for multi-server setup
-- [ ] I've read [MYSQL_SETUP_FOR_BEGINNERS.md](MYSQL_SETUP_FOR_BEGINNERS.md) (if new to databases)
+- [ ] I understand I need PostgreSQL for multi-server setup
+- [ ] I've read [POSTGRESQL_SETUP.md](POSTGRESQL_SETUP.md) (if new to databases)
 - [ ] I understand that player inventories will NOT transfer between servers
 
 ---
 
 ## 🗄️ Database Setup
 
-- [ ] MySQL/MariaDB is installed
-- [ ] Database is secured with `mysql_secure_installation`
+- [ ] PostgreSQL is installed
 - [ ] Database `worldgate` exists
 - [ ] Database user `worldgate` exists with a strong password
 - [ ] User has permissions on the `worldgate` database
 - [ ] Tables created successfully from `database_schema.sql`
-- [ ] I can connect manually: `mysql -u worldgate -p worldgate`
+- [ ] I can connect manually: `psql -U worldgate -d worldgate`
 
 **Test Command:**
 ```bash
-mysql -u worldgate -p worldgate -e "SHOW TABLES;"
+psql -U worldgate -d worldgate -c "\dt"
 ```
 
 **Expected Output:**
@@ -56,12 +55,12 @@ mysql -u worldgate -p worldgate -e "SHOW TABLES;"
 ## 🎮 Server 1 Configuration
 
 - [ ] Worldgate mod installed in mods folder
-- [ ] (Optional) `mysql_base` mod installed
+- [ ] PostgreSQL backend configured in world.mt
 - [ ] `world.mt` or `minetest.conf` configured with:
   - [ ] `worldgate.server_name` = Unique name
   - [ ] `worldgate.server_url` = Full connection URL
   - [ ] `worldgate.db_host` = Database IP/hostname
-  - [ ] `worldgate.db_port` = 3306 (or custom port)
+  - [ ] `worldgate.db_port` = 5432 (or custom port)
   - [ ] `worldgate.db_name` = worldgate
   - [ ] `worldgate.db_user` = worldgate
   - [ ] `worldgate.db_password` = Your password
@@ -85,7 +84,7 @@ Server registered with ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ## 🎮 Server 2 Configuration
 
 - [ ] Worldgate mod installed in mods folder
-- [ ] (Optional) `mysql_base` mod installed
+- [ ] PostgreSQL backend configured in world.mt
 - [ ] `world.mt` or `minetest.conf` configured with:
   - [ ] `worldgate.server_name` = **Different** unique name
   - [ ] `worldgate.server_url` = **Different** connection URL
@@ -133,7 +132,7 @@ worldgate.link_gates_manual(
 
 **Verify in Database:**
 ```sql
-mysql -u worldgate -p worldgate -e "SELECT id, destination_gate_id, destination_server_id FROM worldgates WHERE destination_gate_id IS NOT NULL;"
+psql -U worldgate -d worldgate -c "SELECT id, destination_gate_id, destination_server_id FROM worldgates WHERE destination_gate_id IS NOT NULL;"
 ```
 
 ---
@@ -151,7 +150,7 @@ mysql -u worldgate -p worldgate -e "SELECT id, destination_gate_id, destination_
 
 **Verify Transfer Log:**
 ```sql
-mysql -u worldgate -p worldgate -e "SELECT * FROM transfer_logs ORDER BY transfer_time DESC LIMIT 5;"
+psql -U worldgate -d worldgate -c "SELECT * FROM transfer_logs ORDER BY transfer_time DESC LIMIT 5;"
 ```
 
 ---
@@ -180,14 +179,14 @@ If something isn't working, check these common issues:
 ### Database Connection Failed
 
 **Symptoms:**
-- Errors in `debug.txt` about MySQL
+- Errors in `debug.txt` about PostgreSQL
 - Gates not appearing in database
 - Registration fails
 
 **Solutions:**
-- [ ] Verify MySQL is running: `sudo systemctl status mariadb`
-- [ ] Test connection manually: `mysql -u worldgate -p worldgate`
-- [ ] Check firewall isn't blocking port 3306
+- [ ] Verify PostgreSQL is running: `sudo systemctl status postgresql`
+- [ ] Test connection manually: `psql -U worldgate -d worldgate`
+- [ ] Check firewall isn't blocking port 5432
 - [ ] Verify credentials in `world.mt` match database user
 - [ ] Check `worldgate.db_host` is correct (use `localhost` if same machine)
 
