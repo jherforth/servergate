@@ -2,6 +2,19 @@
 
 This guide explains how to set up PostgreSQL for the Worldgate Server Connector on your private network.
 
+## Quick Setup Summary
+
+**Common Setup:** PostgreSQL on one VM, Luanti servers on different VMs
+
+1. **On PostgreSQL VM:** Install PostgreSQL server
+2. **On PostgreSQL VM:** Configure it to accept remote connections (edit `postgresql.conf` and `pg_hba.conf`)
+3. **On PostgreSQL VM:** Run the `database_schema.sql` file (creates tables + user)
+4. **On PostgreSQL VM:** Configure firewall to allow port 5432 from Luanti servers
+5. **On Luanti servers:** Add database connection info to `world.mt` (using PostgreSQL VM's IP)
+6. **Test:** Connect from Luanti server to verify: `psql -h <postgres-ip> -U worldgate -d worldgate`
+
+**You do NOT need PostgreSQL installed on Luanti servers** (just the mod configuration).
+
 ## Why PostgreSQL?
 
 - **Self-hosted**: You control the database on your own infrastructure
@@ -106,41 +119,84 @@ CREATE DATABASE worldgate;
 
 ### 4. Run the Schema Script
 
-#### Option A: Running Locally (on PostgreSQL VM)
+You have several options depending on your setup:
 
-If you're on the PostgreSQL server itself:
+#### Option A: Run Directly on PostgreSQL Server (Recommended)
 
-```bash
-cd /path/to/minetest/mods/worldgate/
-sudo -u postgres psql -d worldgate < database_schema.sql
-```
+**Best for:** Separate PostgreSQL VM, or when you don't have psql on Luanti servers
 
-#### Option B: Running Remotely (from Luanti server)
-
-If PostgreSQL is on a different machine (recommended for production):
+Transfer the schema file to your PostgreSQL server:
 
 ```bash
-# First, copy the schema file to your Luanti server, then:
-psql -h 192.168.1.100 -U worldgate -d worldgate < database_schema.sql
+# From your Luanti server (where the worldgate mod is)
+scp /path/to/mods/worldgate/database_schema.sql user@192.168.1.100:/tmp/
+
+# SSH to PostgreSQL server
+ssh user@192.168.1.100
+
+# Run the schema (this creates tables AND the worldgate user)
+sudo -u postgres psql -d worldgate < /tmp/database_schema.sql
 ```
 
-Replace `192.168.1.100` with your PostgreSQL server's IP address.
+**Important:** Edit the schema file first to change the default password on line 86:
+```sql
+CREATE USER worldgate WITH PASSWORD 'change_this_password';
+```
 
-**Note:** You must have already:
-1. Created the `worldgate` user (see step 3 of the schema script)
-2. Configured `pg_hba.conf` to allow connections from your Luanti server IP
-3. Set a password for the `worldgate` user
+#### Option B: Run Remotely from Luanti Server
 
-#### Option C: Manual Entry
+**Best for:** When you have PostgreSQL client installed on Luanti server
 
-If you can't transfer the file, connect and paste manually:
+First, install PostgreSQL client tools on your Luanti server (just the client, not the server):
 
 ```bash
-# From any machine that can reach the PostgreSQL server:
-psql -h 192.168.1.100 -U worldgate -d worldgate
+# Ubuntu/Debian
+sudo apt install postgresql-client
+
+# Fedora/RHEL
+sudo dnf install postgresql
+
+# Arch
+sudo pacman -S postgresql-libs
 ```
 
-Then paste the contents of `database_schema.sql` into the PostgreSQL prompt.
+Then run the schema remotely:
+
+```bash
+cd /path/to/mods/worldgate/
+psql -h 192.168.1.100 -U postgres -d worldgate < database_schema.sql
+```
+
+Replace `192.168.1.100` with your PostgreSQL server's IP.
+
+#### Option C: Manual Copy/Paste
+
+**Best for:** When you can't transfer files or install packages
+
+1. On your Luanti server, display the schema:
+   ```bash
+   cat /path/to/mods/worldgate/database_schema.sql
+   ```
+
+2. Copy all the SQL content (it's about 90 lines)
+
+3. SSH to your PostgreSQL server and connect:
+   ```bash
+   sudo -u postgres psql worldgate
+   ```
+
+4. Paste the entire SQL content into the PostgreSQL prompt
+
+5. Press Enter to execute
+
+#### What the Schema Creates
+
+The `database_schema.sql` script does 3 things:
+1. ✅ Creates the three tables (servers, worldgates, transfer_logs) with indexes
+2. ✅ Creates automatic timestamp update triggers
+3. ✅ Creates the `worldgate` database user with proper permissions
+
+**CRITICAL:** The script includes a default password that you MUST change! See step 5 below.
 
 ### 5. Verify the Setup
 
