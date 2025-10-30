@@ -54,7 +54,16 @@ sudo -u postgres psql -d worldgate < database_schema.sql
 
 ## Step 3: Configure Each Server
 
-Add to `minetest.conf` on each server (use different names and URLs):
+Add to **either** `world.mt` (recommended) **or** `minetest.conf` on each server.
+
+**Where to add:** Simply copy/paste these lines to the end of the file.
+
+### Configuration Files:
+
+- **`world.mt`**: `/path/to/minetest/worlds/<worldname>/world.mt` (per-world settings)
+- **`minetest.conf`**: `/path/to/minetest/minetest.conf` (global for all worlds)
+
+Use different names and URLs for each server:
 
 **Server Alpha:**
 ```
