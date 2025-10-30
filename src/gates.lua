@@ -120,4 +120,15 @@ if servergate.settings.native then
       end
     end
   end
+
+  -- Add a guaranteed spawn gate very close to world origin (0,0,0)
+  -- This ensures new players always have a gate within 100 nodes of initial spawn
+  add_gate({
+    position = vn(pcgr:next(-50, 50), pcgr:next(0, 24), pcgr:next(-50, 50)),
+    base = get_random_base(pcgr),
+    decor = get_random_decor(pcgr),
+    quality = 0, -- Average quality
+    exact = false,
+    destination = servergate.settings.native_link and vn(0, 0, 0) or nil,
+  })
 end
