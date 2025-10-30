@@ -33,8 +33,8 @@ This is the most common setup for testing or small networks:
 │         └──────────────────┼──────────────────┘             │
 │                            ▼                                │
 │                   ┌─────────────────┐                       │
-│                   │  MySQL/MariaDB  │                       │
-│                   │   Database      │                       │
+│                   │   PostgreSQL    │                       │
+│                   │    Database     │                       │
 │                   │  (localhost)    │                       │
 │                   └─────────────────┘                       │
 │                                                              │
@@ -59,8 +59,8 @@ For larger networks or distributed hosting:
 │   192.168.1.10          │
 │                         │
 │  ┌──────────────────┐   │
-│  │  MySQL/MariaDB   │   │
-│  │  Port: 3306      │   │
+│  │   PostgreSQL     │   │
+│  │  Port: 5432      │   │
 │  └──────────────────┘   │
 └────────────┬────────────┘
              │
@@ -79,7 +79,7 @@ For larger networks or distributed hosting:
 **Key Points:**
 - Separate database server
 - Each game server connects via network IP
-- Firewall rules needed for port 3306
+- Firewall rules needed for port 5432
 - Better performance for large networks
 
 ---
@@ -100,7 +100,7 @@ For larger networks or distributed hosting:
      │
      ▼
 ┌──────────────────┐
-│ MySQL Database   │ "Gate ABC123 → Server B, Gate XYZ789"
+│ PostgreSQL DB    │ "Gate ABC123 → Server B, Gate XYZ789"
 └────┬─────────────┘
      │
      ▼
@@ -200,7 +200,7 @@ Records every player transfer for analytics and debugging.
 - Host the database
 - Configure network settings
 
-### MySQL/MariaDB Database
+### PostgreSQL Database
 **What it stores:**
 - List of all servers in your network
 - Every worldgate's location and links
@@ -211,15 +211,15 @@ Records every player transfer for analytics and debugging.
 - Proper user permissions
 - Network connectivity
 
-### mysql_base Mod (Optional Dependency)
-**What it does:**
-- Provides MySQL connectivity to Minetest
-- Allows async queries (non-blocking)
-- Handles connection pooling
+### PostgreSQL Backend (Native Support)
+**What it provides:**
+- Native PostgreSQL connectivity in Minetest
+- Built-in support, no external mods needed
+- Configured via world.mt settings
 
-**Alternatives:**
-- Without it, mod uses `mod_storage` (single-server only)
-- You can use a different MySQL mod if preferred
+**Fallback:**
+- Without PostgreSQL configured, mod uses `mod_storage` (single-server only)
+- Multi-server support requires proper PostgreSQL configuration
 
 ---
 
@@ -228,11 +228,11 @@ Records every player transfer for analytics and debugging.
 ### Small Network (2-5 servers)
 - ✅ Single database server is fine
 - ✅ Same machine for database + game servers works
-- ✅ Basic MySQL configuration sufficient
+- ✅ Basic PostgreSQL configuration sufficient
 
 ### Medium Network (5-20 servers)
 - ⚠️ Consider dedicated database server
-- ⚠️ Enable MySQL query caching
+- ⚠️ Enable PostgreSQL query caching
 - ⚠️ Monitor database connections
 
 ### Large Network (20+ servers)
@@ -252,7 +252,7 @@ Records every player transfer for analytics and debugging.
 └───────────────────────┬─────────────────────────────┘
                         │
                 ┌───────▼────────┐
-                │   Firewall     │  Block 3306 from internet
+                │   Firewall     │  Block 5432 from internet
                 └───────┬────────┘
                         │
         ┌───────────────┼───────────────┐
@@ -265,16 +265,16 @@ Records every player transfer for analytics and debugging.
         └───────────────┼───────────────┘
                         │
                    ┌────▼─────┐
-                   │ Database │  Private port 3306
-                   │ :3306    │  Only accessible internally
+                   │ Database │  Private port 5432
+                   │ :5432    │  Only accessible internally
                    └──────────┘
 ```
 
 **Security Best Practices:**
-1. **Firewall**: Block port 3306 from internet
+1. **Firewall**: Block port 5432 from internet
 2. **Strong Passwords**: 16+ characters for database user
 3. **Limited Permissions**: Database user only needs access to `worldgate` database
-4. **No Root Access**: Never use MySQL root user in configs
+4. **No Superuser Access**: Never use postgres superuser in configs
 5. **Backups**: Regular database backups
 
 ---
@@ -285,7 +285,7 @@ Records every player transfer for analytics and debugging.
 Problem: "Gates not linking"
     │
     ├─→ Check database connection
-    │   └─→ Can you connect with mysql command?
+    │   └─→ Can you connect with psql command?
     │       ├─→ Yes: Database is fine
     │       └─→ No: Check credentials in world.mt
     │
@@ -300,7 +300,7 @@ Problem: "Gates not linking"
 
 ## Next Steps
 
-1. **Setup**: Follow [MYSQL_SETUP_FOR_BEGINNERS.md](MYSQL_SETUP_FOR_BEGINNERS.md)
+1. **Setup**: Follow [POSTGRESQL_SETUP.md](POSTGRESQL_SETUP.md)
 2. **Configure**: Add database credentials to each server
 3. **Register**: Run `/worldgate_register_server` on each server
 4. **Link**: Use admin commands to link gates

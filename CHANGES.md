@@ -42,15 +42,15 @@ This mod has been transformed from a local teleportation system (based on Telemo
    - Both mods can now coexist in the same world without conflicts
 
 2. **Added Database Synchronization**
-   - MariaDB/MySQL integration for cross-server coordination
-   - Self-hosted database on your private network
+   - PostgreSQL integration for cross-server coordination
+   - Self-hosted database on your private network (native Minetest support)
    - Three database tables:
      - `servers` - Server registry with configurable URLs
      - `worldgates` - Gate positions and links
      - `transfer_logs` - Transfer history
 
 3. **Server Transfer System**
-   - New `server_api.lua` module for MariaDB/MySQL communication
+   - New `server_api.lua` module for PostgreSQL communication
    - Automatic server registration and heartbeat
    - Configurable server URLs for player transfers
    - Gate registration in database on generation

@@ -72,7 +72,7 @@ LIMIT 10;
 ```sql
 SELECT player_name, COUNT(*) as transfers
 FROM transfer_logs
-WHERE success = 1
+WHERE success = TRUE
 GROUP BY player_name
 ORDER BY transfers DESC;
 ```
@@ -90,7 +90,7 @@ WHERE destination_gate_id IS NULL;
 
 ### Test Database Connection
 ```bash
-mysql -u worldgate -p worldgate -e "SELECT 1;"
+psql -U worldgate -d worldgate -c "SELECT 1;"
 ```
 
 ### Check Server Registration
@@ -103,19 +103,19 @@ SELECT * FROM servers WHERE name = 'Your Server Name';
 SELECT * FROM worldgates WHERE id = 'your-gate-uuid';
 ```
 
-### Check MySQL Service
+### Check PostgreSQL Service
 ```bash
-sudo systemctl status mariadb
+sudo systemctl status postgresql
 ```
 
-### Restart MySQL
+### Restart PostgreSQL
 ```bash
-sudo systemctl restart mariadb
+sudo systemctl restart postgresql
 ```
 
-### View Recent MySQL Errors
+### View Recent PostgreSQL Errors
 ```bash
-sudo tail -n 50 /var/log/mysql/error.log
+sudo tail -n 50 /var/log/postgresql/postgresql-*.log
 ```
 
 ---
@@ -151,7 +151,7 @@ sudo tail -n 50 /var/log/mysql/error.log
 worldgate.server_name = Fantasy Server
 worldgate.server_url = minetest://game.example.com:30000
 worldgate.db_host = localhost
-worldgate.db_port = 3306
+worldgate.db_port = 5432
 worldgate.db_name = worldgate
 worldgate.db_user = worldgate
 worldgate.db_password = your_secure_password
@@ -179,25 +179,25 @@ worldgate.ymax = 5000
 
 ### Backup Database
 ```bash
-mysqldump -u worldgate -p worldgate > worldgate_backup_$(date +%Y%m%d).sql
+pg_dump -U worldgate worldgate > worldgate_backup_$(date +%Y%m%d).sql
 ```
 
 ### Restore Database
 ```bash
-mysql -u worldgate -p worldgate < worldgate_backup_20240115.sql
+psql -U worldgate -d worldgate < worldgate_backup_20240115.sql
 ```
 
 ### Clean Old Transfer Logs (> 30 days)
 ```sql
 DELETE FROM transfer_logs
-WHERE transfer_time < DATE_SUB(NOW(), INTERVAL 30 DAY);
+WHERE transfer_time < NOW() - INTERVAL '30 days';
 ```
 
 ### Optimize Database
 ```sql
-OPTIMIZE TABLE servers;
-OPTIMIZE TABLE worldgates;
-OPTIMIZE TABLE transfer_logs;
+VACUUM ANALYZE servers;
+VACUUM ANALYZE worldgates;
+VACUUM ANALYZE transfer_logs;
 ```
 
 ---
@@ -206,7 +206,7 @@ OPTIMIZE TABLE transfer_logs;
 
 ### Total Transfers
 ```sql
-SELECT COUNT(*) FROM transfer_logs WHERE success = 1;
+SELECT COUNT(*) FROM transfer_logs WHERE success = TRUE;
 ```
 
 ### Busiest Gates
@@ -232,7 +232,7 @@ ORDER BY transfers DESC;
 ```sql
 SELECT DATE(transfer_time) as date, COUNT(*) as transfers
 FROM transfer_logs
-WHERE transfer_time >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+WHERE transfer_time >= NOW() - INTERVAL '7 days'
 GROUP BY DATE(transfer_time)
 ORDER BY date;
 ```
@@ -243,25 +243,24 @@ ORDER BY date;
 
 ### Create Database User
 ```sql
-CREATE USER 'worldgate'@'localhost' IDENTIFIED BY 'strong_password';
-GRANT ALL PRIVILEGES ON worldgate.* TO 'worldgate'@'localhost';
-FLUSH PRIVILEGES;
+CREATE USER worldgate WITH PASSWORD 'strong_password';
+GRANT ALL PRIVILEGES ON DATABASE worldgate TO worldgate;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO worldgate;
 ```
 
 ### Change Database Password
 ```sql
-ALTER USER 'worldgate'@'localhost' IDENTIFIED BY 'new_password';
-FLUSH PRIVILEGES;
+ALTER USER worldgate WITH PASSWORD 'new_password';
 ```
 
 ### Check User Permissions
 ```sql
-SHOW GRANTS FOR 'worldgate'@'localhost';
+\du worldgate
 ```
 
 ### List All Database Users
 ```sql
-SELECT User, Host FROM mysql.user;
+\du
 ```
 
 ---
@@ -286,7 +285,7 @@ WHERE id = 'problem-gate-uuid';
 
 ### Remove Failed Transfers
 ```sql
-DELETE FROM transfer_logs WHERE success = 0;
+DELETE FROM transfer_logs WHERE success = FALSE;
 ```
 
 ### Reset Server Registration
@@ -300,7 +299,7 @@ DELETE FROM servers WHERE id = 'server-uuid-to-remove';
 ## 📖 Full Documentation
 
 - [SETUP_CHECKLIST.md](SETUP_CHECKLIST.md) - Setup verification
-- [MYSQL_SETUP_FOR_BEGINNERS.md](MYSQL_SETUP_FOR_BEGINNERS.md) - Database installation
+- [POSTGRESQL_SETUP.md](POSTGRESQL_SETUP.md) - Database installation
 - [ARCHITECTURE.md](ARCHITECTURE.md) - System architecture
 - [API.md](API.md) - Full API reference
 - [DATABASE_QUERIES.md](DATABASE_QUERIES.md) - Advanced queries
@@ -312,12 +311,12 @@ DELETE FROM servers WHERE id = 'server-uuid-to-remove';
 
 1. **Always backup before making changes:**
    ```bash
-   mysqldump -u worldgate -p worldgate > backup.sql
+   pg_dump -U worldgate worldgate > backup.sql
    ```
 
 2. **Test connections after config changes:**
    ```bash
-   mysql -u worldgate -p worldgate -e "SELECT 1;"
+   psql -U worldgate -d worldgate -c "SELECT 1;"
    ```
 
 3. **Monitor debug.txt for errors:**

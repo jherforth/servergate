@@ -1,10 +1,10 @@
 # Useful Database Queries
 
-These SQL queries can be run directly on your MariaDB/MySQL server for managing your worldgate network.
+These SQL queries can be run directly on your PostgreSQL server for managing your worldgate network.
 
 Connect to your database:
 ```bash
-mysql -u worldgate -p worldgate
+psql -U worldgate -d worldgate
 ```
 
 ## Server Management
@@ -13,7 +13,7 @@ mysql -u worldgate -p worldgate
 ```sql
 SELECT name, url, updated_at
 FROM servers
-WHERE is_active = 1
+WHERE is_active = TRUE
 ORDER BY name;
 ```
 
@@ -21,15 +21,15 @@ ORDER BY name;
 ```sql
 SELECT name, url, updated_at
 FROM servers
-WHERE is_active = 0
-  OR updated_at < NOW() - INTERVAL 5 MINUTE
+WHERE is_active = FALSE
+  OR updated_at < NOW() - INTERVAL '5 minutes'
 ORDER BY updated_at DESC;
 ```
 
 ### Deactivate a Server
 ```sql
 UPDATE servers
-SET is_active = 0
+SET is_active = FALSE
 WHERE name = 'Server Name';
 ```
 
@@ -136,7 +136,7 @@ LIMIT 50;
 SELECT
   player_name,
   COUNT(*) as transfer_count,
-  COUNT(*) FILTER (WHERE success = true) as successful_transfers
+  COUNT(*) FILTER (WHERE success = TRUE) as successful_transfers
 FROM transfer_logs
 GROUP BY player_name
 ORDER BY transfer_count DESC;
@@ -165,7 +165,7 @@ SELECT
 FROM transfer_logs t
 LEFT JOIN servers s1 ON t.source_server_id = s1.id
 LEFT JOIN servers s2 ON t.destination_server_id = s2.id
-WHERE success = false
+WHERE success = FALSE
 ORDER BY transfer_time DESC
 LIMIT 50;
 ```
@@ -174,7 +174,7 @@ LIMIT 50;
 ```sql
 SELECT
   COUNT(*) as total_transfers,
-  COUNT(*) FILTER (WHERE success = true) as successful,
+  COUNT(*) FILTER (WHERE success = TRUE) as successful,
   COUNT(DISTINCT player_name) as unique_players
 FROM transfer_logs
 WHERE transfer_time > NOW() - INTERVAL '1 hour';
@@ -249,10 +249,10 @@ ORDER BY s1.name, s2.name;
 4. **Check constraints** - some deletes may cascade
 5. **Monitor logs** table size and clean regularly
 
-## Supabase Dashboard Shortcuts
+## PostgreSQL Tools
 
-- **Table Editor**: View and edit data visually
-- **SQL Editor**: Run custom queries
-- **Database > Roles**: Manage RLS policies
-- **API Docs**: Auto-generated API documentation
-- **Logs**: View database query logs
+- **psql**: Command-line PostgreSQL client
+- **pgAdmin**: Web-based PostgreSQL administration
+- **Table Viewer**: `\dt` to list tables, `\d tablename` for schema
+- **Query History**: `\s` to view command history
+- **Help**: `\?` for psql commands, `\h` for SQL help
