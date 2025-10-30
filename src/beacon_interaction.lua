@@ -75,7 +75,7 @@ local function show_linking_dialog(player_name, pos, source_gate_id, available_g
   minetest.show_formspec(player_name, "servergate:link", formspec)
 end
 
--- Handle beacon interaction (punch while crouching or right-click)
+-- Handle beacon interaction (right-click or stand on beacon)
 local function on_beacon_interact(pos, node, player, itemstack, pointed_thing)
   if not player or not player:is_player() then
     return
@@ -135,6 +135,38 @@ local function on_beacon_interact(pos, node, player, itemstack, pointed_thing)
     end)
   end
 end
+
+-- Track player positions to detect jumping on beacons
+local player_last_pos = {}
+local player_interaction_cooldown = {}
+
+minetest.register_globalstep(function(dtime)
+  for _, player in ipairs(minetest.get_connected_players()) do
+    local player_name = player:get_player_name()
+    local pos = player:get_pos()
+    local node_below = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
+
+    -- Check if player is standing on a beacon
+    if node_below.name == "servergate:servergate_beacon" or node_below.name == "servergate:servergate_beacon_off" then
+      local beacon_pos = {x=math.floor(pos.x+0.5), y=math.floor(pos.y-1+0.5), z=math.floor(pos.z+0.5)}
+
+      -- Check cooldown (prevent spam)
+      local cooldown_key = player_name .. minetest.pos_to_string(beacon_pos)
+      local current_time = minetest.get_us_time() / 1000000
+
+      if not player_interaction_cooldown[cooldown_key] or
+         (current_time - player_interaction_cooldown[cooldown_key]) > 2 then
+
+        -- Detect if player jumped (y velocity or control check)
+        local player_control = player:get_player_control()
+        if player_control.jump then
+          player_interaction_cooldown[cooldown_key] = current_time
+          on_beacon_interact(beacon_pos, node_below, player, nil, nil)
+        end
+      end
+    end
+  end
+end)
 
 -- Handle formspec submissions
 minetest.register_on_player_receive_fields(function(player, formname, fields)
@@ -218,25 +250,11 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   return false
 end)
 
--- Handle crouch-punch separately (for linking unlinked gates)
-local function on_beacon_crouch_punch(pos, node, puncher)
-  if not puncher or not puncher:is_player() then
-    return
-  end
-
-  local player_control = puncher:get_player_control()
-  if player_control.sneak then
-    on_beacon_interact(pos, node, puncher, nil, nil)
-  end
-end
-
--- Update beacon node definitions to handle interactions
+-- Update beacon node definitions to handle right-click
 minetest.override_item("servergate:servergate_beacon", {
   on_rightclick = on_beacon_interact,
-  on_punch = on_beacon_crouch_punch,
 })
 
 minetest.override_item("servergate:servergate_beacon_off", {
   on_rightclick = on_beacon_interact,
-  on_punch = on_beacon_crouch_punch,
 })

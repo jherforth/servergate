@@ -339,7 +339,22 @@ minetest.register_on_generated(function(minp,maxp,blockseed)
             gate.decor,
             gate.quality,
             function(success, err)
-              if not success then
+              if success then
+                minetest.log("action", "Gate " .. gate_uuid:sub(1,8) .. " registered in database at " .. minetest.pos_to_string(gate.position))
+
+                -- Notify nearby players
+                local pos_rounded = vector.round(gate.position)
+                for _, player in ipairs(minetest.get_connected_players()) do
+                  local player_pos = player:get_pos()
+                  local distance = vector.distance(player_pos, pos_rounded)
+                  if distance <= 150 then -- Within 150 nodes
+                    minetest.chat_send_player(
+                      player:get_player_name(),
+                      "Worldgate discovered and registered! (ID: " .. gate_uuid:sub(1,8) .. "...)"
+                    )
+                  end
+                end
+              else
                 minetest.log("error", "Failed to register gate in database: " .. tostring(err))
               end
             end
