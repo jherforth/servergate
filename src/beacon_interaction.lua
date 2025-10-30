@@ -8,15 +8,16 @@ local player_context = {}
 -- Show travel confirmation dialog
 local function show_travel_dialog(player_name, pos, dest_server_name, dest_url)
   local formspec = "formspec_version[4]" ..
-    "size[10,6]" ..
+    "size[10,7]" ..
     "label[0.5,0.5;Worldgate Destination]" ..
-    "textarea[0.5,1;9,2;;;" ..
+    "textarea[0.5,1;9,2.5;;;" ..
     "This gate is linked to:\n" ..
     dest_server_name .. "\n" ..
-    dest_url .. "]" ..
-    "label[0.5,3.5;Click the button below to copy the connection command]" ..
-    "button[0.5,4.5;4,1;copy;Copy Connection Command]" ..
-    "button[5,4.5;4,1;close;Close]"
+    dest_url .. "\n\n" ..
+    "Click GO to travel to this server!]" ..
+    "button[0.5,4.5;4,1;go;GO!]" ..
+    "button[5,4.5;4,1;close;Cancel]" ..
+    "label[0.5,6;Note: Your inventory will not transfer between servers]"
 
   player_context[player_name] = {
     pos = pos,
@@ -74,18 +75,13 @@ local function show_linking_dialog(player_name, pos, source_gate_id, available_g
   minetest.show_formspec(player_name, "servergate:link", formspec)
 end
 
--- Handle beacon punch while crouching
-local function on_beacon_crouch_punch(pos, node, puncher)
-  if not puncher or not puncher:is_player() then
+-- Handle beacon interaction (punch while crouching or right-click)
+local function on_beacon_interact(pos, node, player, itemstack, pointed_thing)
+  if not player or not player:is_player() then
     return
   end
 
-  local player_name = puncher:get_player_name()
-  local player_control = puncher:get_player_control()
-
-  if not player_control.sneak then
-    return
-  end
+  local player_name = player:get_player_name()
 
   if not servergate.db or not servergate.db.available then
     minetest.chat_send_player(player_name, "Database not available. Configure PostgreSQL to use gate linking.")
@@ -159,10 +155,23 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   end
 
   if formname == "servergate:travel" then
-    if fields.copy then
-      local cmd = "/connect " .. context.dest_url
-      minetest.chat_send_player(player_name, "Connection command: " .. cmd)
-      minetest.chat_send_player(player_name, "Copy and paste this command to transfer servers")
+    if fields.go then
+      local player_obj = minetest.get_player_by_name(player_name)
+      if player_obj then
+        minetest.chat_send_player(player_name, "Initiating transfer to: " .. context.dest_url)
+
+        -- Use Minetest's request_player_transfer API
+        minetest.after(0.5, function()
+          local transfer_player = minetest.get_player_by_name(player_name)
+          if transfer_player then
+            local success = minetest.request_player_transfer(transfer_player, context.dest_url)
+            if not success then
+              minetest.chat_send_player(player_name, "Transfer failed. Please manually connect with: /connect " .. context.dest_url)
+            end
+          end
+        end)
+      end
+
       player_context[player_name] = nil
       return true
     end
@@ -209,11 +218,25 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   return false
 end)
 
--- Update beacon node definitions to handle crouch-punch
+-- Handle crouch-punch separately (for linking unlinked gates)
+local function on_beacon_crouch_punch(pos, node, puncher)
+  if not puncher or not puncher:is_player() then
+    return
+  end
+
+  local player_control = puncher:get_player_control()
+  if player_control.sneak then
+    on_beacon_interact(pos, node, puncher, nil, nil)
+  end
+end
+
+-- Update beacon node definitions to handle interactions
 minetest.override_item("servergate:servergate_beacon", {
+  on_rightclick = on_beacon_interact,
   on_punch = on_beacon_crouch_punch,
 })
 
 minetest.override_item("servergate:servergate_beacon_off", {
+  on_rightclick = on_beacon_interact,
   on_punch = on_beacon_crouch_punch,
 })

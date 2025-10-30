@@ -48,13 +48,6 @@ minetest.register_node("servergate:servergate_beacon", {
   paramtype = "light",
   drawtype = "glasslike",
   sunlight_propagates = true,
-  on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-    if not clicker or not clicker:is_player() then
-      return
-    end
-
-    servergate.initiate_transfer(pos, clicker)
-  end,
 })
 
 minetest.register_node("servergate:servergate_beacon_off", {
