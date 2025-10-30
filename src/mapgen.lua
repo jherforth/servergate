@@ -167,18 +167,23 @@ minetest.register_on_generated(function(minp,maxp,blockseed)
             break
           end
 
-          -- Check for valid space above
-          for ypos = pos + ystride * 2, pos + ystride * 10, ystride do
+          -- Check for valid space above (need at least 11 blocks of clearance for gate)
+          local valid_clearance = true
+          for ypos = pos + ystride * 2, pos + ystride * 11, ystride do
             local ydata = vdata[ypos]
-            if not ydata or ydata == minetest.CONTENT_IGNORE or (not underwaterspawn and water[ydata]) then
+            if not ydata or ydata == minetest.CONTENT_IGNORE or ydata ~= minetest.CONTENT_AIR or (not underwaterspawn and water[ydata]) then
+              valid_clearance = false
               break
             end
           end
 
-          -- A valid location was found on the heightmap
-          location = vn(randomx,heightmapy,randomz)
-          strategy = "heightmap"
-          i = 10 -- break outer loop
+          -- Only accept this location if there's valid clearance
+          if valid_clearance then
+            -- A valid location was found on the heightmap
+            location = vn(randomx,heightmapy,randomz)
+            strategy = "heightmap"
+            i = 10 -- break outer loop
+          end
         end
       until true end
 
@@ -192,9 +197,21 @@ minetest.register_on_generated(function(minp,maxp,blockseed)
             pos = pos - ystride -- probe downwards until we find something that isn't air
           end
           if vdata[pos] and vdata[pos] ~= minetest.CONTENT_IGNORE then
-            location = va:position(pos)
-            strategy = "grounded"
-            break
+            -- Check for adequate clearance above (at least 11 blocks)
+            local valid_clearance = true
+            for ypos = pos + ystride, pos + ystride * 11, ystride do
+              local ydata = vdata[ypos]
+              if not ydata or ydata ~= minetest.CONTENT_AIR then
+                valid_clearance = false
+                break
+              end
+            end
+
+            if valid_clearance then
+              location = va:position(pos)
+              strategy = "grounded"
+              break
+            end
           end
         end
       end
