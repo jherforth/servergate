@@ -16,7 +16,7 @@ worldgate = {
     ymin = tonumber(minetest.settings:get("worldgate.ymin",-29900) or -29900),
     ymax = tonumber(minetest.settings:get("worldgate.ymax",29900) or 29900),
     underwaterspawn = minetest.settings:get_bool("worldgate.underwaterspawn",false),
-    midairspawn = minetest.settings:get_bool("worldgate.midairspawn",false),
+    midairspawn = minetest.settings:get_bool("worldgate.midairspawn",true),
     breakage = tonumber(minetest.settings:get("worldgate.breakage",8) or 8),
     beaconglow = minetest.settings:get_bool("worldgate.beaconglow",true),
   },
