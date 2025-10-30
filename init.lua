@@ -19,6 +19,8 @@ servergate = {
     midairspawn = minetest.settings:get_bool("servergate.midairspawn",true),
     breakage = tonumber(minetest.settings:get("servergate.breakage",8) or 8),
     beaconglow = minetest.settings:get_bool("servergate.beaconglow",true),
+    superextenders = minetest.settings:get_bool("servergate.superextenders",false),
+    destroykeys = minetest.settings:get_bool("servergate.destroykeys",false),
   },
 }
 
