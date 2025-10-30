@@ -73,7 +73,7 @@ worldgate.ymin (Worldgate minimum y position) int -29900 -29900 0
 worldgate.underwaterspawn (Generate worldgates underwater?) bool false
 
 # Generate worldgates in midair? If set, worldgates can be floating on their own in the air; if unset, gates that attempt to generate in the air will fail to generate.
-worldgate.midairspawn (Generate worldgates in midair?) bool false
+worldgate.midairspawn (Generate worldgates in midair?) bool true
 
 # Percentage chance of a decorative structure node being broken when a gate generates.
 worldgate.breakage (Percent chance of structure damage) int 8 0 100

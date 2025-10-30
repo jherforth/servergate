@@ -39,6 +39,7 @@ load("mapgen")
 load("logging")
 load("settings_overrides")
 load("link")
+load("spawn_gate")
 
 -- Load admin commands
 dofile(worldgate.modpath .. "/admin_commands.lua")
