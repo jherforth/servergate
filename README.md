@@ -9,7 +9,9 @@ A Luanti/Minetest mod that generates ancient worldgate structures throughout you
 
 - **Automatic Gate Generation**: Worldgates spawn throughout the world with various architectural styles
 - **Server Network**: Connect multiple Luanti/Minetest servers through a shared database
-- **Cross-Server Transfers**: Players can transfer between servers by using linked servergates
+- **Interactive Linking**: No commands needed - crouch-punch or right-click beacons to link gates between servers
+- **One-Click Travel**: Click the GO button to instantly transfer to linked servers
+- **Automatic Registration**: Gates automatically register in the database when generated
 - **Visual Transfer Screen**: Fullscreen portal animation when transferring servers
 - **Transfer Logging**: All transfers are logged for debugging and analytics
 - **Configurable Spawning**: Control where and how gates generate in your world
@@ -18,11 +20,14 @@ A Luanti/Minetest mod that generates ancient worldgate structures throughout you
 ## How It Works
 
 1. Each server runs the worldgate mod and connects to a shared PostgreSQL database
-2. When gates generate, they spawn with red servergate beacons in their centers
-3. Server admins can link servergate beacons between different servers
-4. Players right-click a servergate beacon to see a fullscreen transfer screen with destination info
-5. Players disconnect and reconnect using the provided server address
-6. Transfer cooldowns prevent spam (5 seconds by default)
+2. When gates generate, they automatically register in the database with unique IDs
+3. Players or admins interact with beacons to link gates:
+   - **Crouch-punch or right-click** an unlinked beacon → Choose a destination from the list
+   - The gate links automatically, no commands or UUIDs needed!
+4. Players use linked gates to travel:
+   - **Right-click or crouch-punch** a linked beacon → Dialog appears
+   - **Click GO!** → Instantly transfer to the destination server
+5. All transfers are logged in the database for analytics
 
 **📖 Want to understand the architecture?** See [ARCHITECTURE.md](ARCHITECTURE.md) for diagrams and detailed explanations.
 
@@ -93,18 +98,31 @@ For the best player experience, add a custom transfer screen background:
 
 See [TRANSFER_SCREEN.md](TRANSFER_SCREEN.md) for detailed setup and customization.
 
-### 5. Linking Gates
+### 5. Using Gates
 
-Gates can be linked using the Lua API:
+**Linking Gates (No Commands Required!):**
 
-```lua
-servergate.link_gates_manual(source_beacon_pos, destination_gate_id, destination_server_id)
-```
+1. Find an unlinked beacon (dark red)
+2. **Crouch-punch or right-click** the beacon
+3. A dialog appears showing all available gates from other servers
+4. Select a destination gate from the list
+5. Click "Link to Selected Gate"
+6. Done! The beacon lights up (glowing red)
 
-Where:
-- `source_beacon_pos` is the position of the beacon node
-- `destination_gate_id` is the UUID of the destination gate from the database
-- `destination_server_id` is the UUID of the destination server
+**Traveling Between Servers:**
+
+1. Find a linked beacon (glowing red)
+2. **Right-click or crouch-punch** the beacon
+3. A dialog shows the destination server
+4. Click the **GO!** button
+5. You're automatically transferred!
+
+**Admin Commands (Optional):**
+
+You can still use commands if preferred:
+- `/worldgate_info` - View gate information
+- `/worldgate_link <gate_id>` - Link to a specific gate by ID
+- `/worldgate_list` - List all gates on this server
 
 ## Configuration Options
 
@@ -141,6 +159,8 @@ This is a technical limitation because:
 
 ## 📚 Documentation
 
+- **[USER_GUIDE.md](USER_GUIDE.md)** - Complete guide for players and admins
+- **[QUICKSTART.md](QUICKSTART.md)** - Fast setup guide
 - **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Commands and queries cheat sheet
 - **[SETUP_CHECKLIST.md](SETUP_CHECKLIST.md)** - Complete setup verification
 - **[POSTGRESQL_SETUP.md](POSTGRESQL_SETUP.md)** - PostgreSQL database setup guide

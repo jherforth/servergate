@@ -102,56 +102,52 @@ servergate.native.link = false
 
 ## Step 5: Link Gates Between Servers
 
-### Find Gate IDs
+**Easy Interactive Linking (No Commands!):**
 
-On Server Alpha:
-1. Find a servergate beacon (glowing red block in the center of a worldgate structure)
-2. Look at it and run: `/worldgate_info`
-3. Note the `Gate ID` (a UUID like `12345678-abcd-...`)
+### On Server Alpha:
+1. Find a servergate beacon (dark red block in center of worldgate)
+2. **Crouch and punch** (or right-click) the beacon
+3. A dialog appears listing all available gates from other servers
+4. Select a gate from Server Beta
+5. Click "Link to Selected Gate"
+6. Done! The beacon lights up (glowing red)
 
-On Server Beta:
-1. Find another servergate beacon
-2. Look at it and run: `/worldgate_info`
-3. Note the `Gate ID`
+### On Server Beta:
+1. Find another beacon
+2. **Crouch and punch** (or right-click) it
+3. Select the gate from Server Alpha
+4. Click "Link to Selected Gate"
+5. Gates are now linked both ways!
 
-### Get Server IDs
+**Advanced: Using Commands (Optional)**
 
-Query your database directly:
-```sql
-SELECT id, name, url FROM servers;
-```
+If you prefer commands:
 
-Or check the server logs when they start - they print their server ID.
-
-### Link the Gates
-
-On Server Alpha, while looking at a beacon:
-```
-/worldgate_link <gate_id_from_beta> <server_id_of_beta>
-```
-
-On Server Beta, link back to Alpha:
-```
-/worldgate_link <gate_id_from_alpha> <server_id_of_alpha>
-```
+1. Look at a beacon and run `/worldgate_info` to get its Gate ID
+2. Run `/worldgate_link <destination_gate_id>` while looking at the source beacon
+3. The system automatically finds the destination server from the database
 
 ## Step 6: Test the Connection
 
-1. On Server Alpha, right-click the linked beacon
-2. You should see:
-   ```
-   Connect to destination: Server Beta at minetest://beta.example.com:30001
-   Copy this command: /connect minetest://beta.example.com:30001
-   ```
-3. Players can copy/paste that command to switch servers
+1. On Server Alpha, **right-click or crouch-punch** the linked beacon
+2. A dialog appears showing:
+   - Destination: Server Beta
+   - Connection URL: minetest://beta.example.com:30001
+   - **GO!** button
+3. Click the **GO!** button
+4. You're automatically transferred to Server Beta!
 
 **⚠️ IMPORTANT:** Player inventories do NOT transfer between servers. Players will lose all items, armor, and wielded equipment when transferring. This is a technical limitation as servers may run different games/mods with incompatible items.
 
-## Admin Commands
+## Admin Commands (Optional)
+
+Commands are no longer required for normal use, but available if needed:
 
 - `/worldgate_info` - Get info about the gate you're looking at
-- `/worldgate_link <dest_gate_id> <dest_server_id>` - Link a gate
-- `/worldgate_list` - List all gates on this server
+- `/worldgate_link <dest_gate_id>` - Link a gate by UUID (system finds the server automatically)
+- `/worldgate_list` - List all gates on this server from the database
+
+**Note:** Most users prefer the interactive crouch-punch/right-click method!
 
 ## Troubleshooting
 

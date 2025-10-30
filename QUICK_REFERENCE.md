@@ -4,33 +4,55 @@ Essential commands and queries for daily management of your worldgate network.
 
 ---
 
-## 🎮 In-Game Commands (Admin Only)
+## 🎮 Player Actions (No Admin Required!)
 
-### Register Server
-```
-/worldgate_register_server
-```
-Registers the current server in the shared database. Run once per server.
+### Link Gates Between Servers
+1. **Crouch-punch or right-click** an unlinked beacon (dark red)
+2. Select a destination from the list
+3. Click "Link to Selected Gate"
+4. Done! Beacon lights up (glowing red)
 
-**Output:** Server ID (save this!)
+### Travel to Another Server
+1. **Right-click or crouch-punch** a linked beacon (glowing red)
+2. Click the **GO!** button in the dialog
+3. You're automatically transferred!
 
 ---
 
-## 🔧 Admin Functions (Lua Console)
+## 🔧 Admin Commands (Optional)
 
-### Link Two Gates
-```lua
-servergate.link_gates_manual(
-  {x=100, y=50, z=200},     -- Source beacon position
-  "dest-gate-uuid",          -- Destination gate ID
-  "dest-server-uuid"         -- Destination server ID
-)
+### Get Gate Information
 ```
+/worldgate_info
+```
+Look at a beacon and run this to see its Gate ID, destination, and server info.
 
-### Get Gate Info
+### Link Gates by UUID
+```
+/worldgate_link <destination_gate_id>
+```
+Look at a beacon and run this to link it to another gate by UUID.
+The system automatically finds which server the destination is on.
+
+### List All Gates
+```
+/worldgate_list
+```
+Shows all gates registered on this server from the database.
+
+### Advanced Lua Functions
 ```lua
+-- Get gate info from metadata
 local meta = minetest.get_meta({x=100, y=50, z=200})
 print(meta:get_string("servergate:gate_id"))
+
+-- Link gates programmatically (for automation)
+servergate.db.link_gates(
+  "source-gate-uuid",
+  "dest-gate-uuid",
+  "dest-server-uuid",
+  callback_function
+)
 ```
 
 ---
