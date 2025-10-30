@@ -106,17 +106,38 @@ CREATE DATABASE worldgate;
 
 ### 4. Run the Schema Script
 
-Apply the worldgate schema:
+#### Option A: Running Locally (on PostgreSQL VM)
+
+If you're on the PostgreSQL server itself:
 
 ```bash
 cd /path/to/minetest/mods/worldgate/
 sudo -u postgres psql -d worldgate < database_schema.sql
 ```
 
-Or manually:
+#### Option B: Running Remotely (from Luanti server)
+
+If PostgreSQL is on a different machine (recommended for production):
 
 ```bash
-sudo -u postgres psql worldgate
+# First, copy the schema file to your Luanti server, then:
+psql -h 192.168.1.100 -U worldgate -d worldgate < database_schema.sql
+```
+
+Replace `192.168.1.100` with your PostgreSQL server's IP address.
+
+**Note:** You must have already:
+1. Created the `worldgate` user (see step 3 of the schema script)
+2. Configured `pg_hba.conf` to allow connections from your Luanti server IP
+3. Set a password for the `worldgate` user
+
+#### Option C: Manual Entry
+
+If you can't transfer the file, connect and paste manually:
+
+```bash
+# From any machine that can reach the PostgreSQL server:
+psql -h 192.168.1.100 -U worldgate -d worldgate
 ```
 
 Then paste the contents of `database_schema.sql` into the PostgreSQL prompt.
@@ -303,17 +324,95 @@ sudo systemctl restart postgresql
 
 ### Can't connect from game server
 
+**This is the most common issue when PostgreSQL is on a different machine.**
+
+#### Step 1: Verify PostgreSQL is listening on the network
+
+On the **PostgreSQL server**:
+
 ```bash
-# Check if PostgreSQL is listening
+# Check if PostgreSQL is listening on all interfaces (0.0.0.0)
 sudo netstat -tlnp | grep 5432
 
-# Check firewall
+# Should show something like:
+# tcp  0  0.0.0.0:5432  0.0.0.0:*  LISTEN  12345/postgres
+```
+
+If it only shows `127.0.0.1:5432`, PostgreSQL is only listening locally. Fix this:
+
+```bash
+sudo nano /etc/postgresql/*/main/postgresql.conf
+# Change: listen_addresses = 'localhost'
+# To:     listen_addresses = '*'
+
+sudo systemctl restart postgresql
+```
+
+#### Step 2: Check pg_hba.conf allows your Luanti server
+
+On the **PostgreSQL server**:
+
+```bash
+sudo cat /etc/postgresql/*/main/pg_hba.conf | grep -v "^#"
+```
+
+You should see a line like:
+```
+host    worldgate    worldgate    192.168.1.0/24    md5
+```
+
+Where `192.168.1.0/24` includes your Luanti server's IP. If not, add it:
+
+```bash
+sudo nano /etc/postgresql/*/main/pg_hba.conf
+# Add this line (replace with your Luanti server's IP):
+host    worldgate    worldgate    192.168.1.50/32    md5
+
+sudo systemctl restart postgresql
+```
+
+#### Step 3: Test network connectivity
+
+From your **Luanti server**:
+
+```bash
+# Test if port 5432 is reachable
+telnet 192.168.1.100 5432
+
+# Or use nc (netcat)
+nc -zv 192.168.1.100 5432
+
+# Should output: Connection to 192.168.1.100 5432 port [tcp/postgresql] succeeded!
+```
+
+If this fails, check firewall rules (Step 4).
+
+#### Step 4: Check firewall on PostgreSQL server
+
+On the **PostgreSQL server**:
+
+```bash
+# Check firewall status
 sudo ufw status
 sudo iptables -L -n | grep 5432
 
-# Test from game server
-telnet 192.168.1.100 5432
+# If blocked, allow your Luanti server(s):
+sudo ufw allow from 192.168.1.50 to any port 5432
+sudo ufw allow from 192.168.1.51 to any port 5432
+
+# Or allow entire subnet:
+sudo ufw allow from 192.168.1.0/24 to any port 5432
 ```
+
+#### Step 5: Test PostgreSQL authentication
+
+From your **Luanti server**:
+
+```bash
+psql -h 192.168.1.100 -U worldgate -d worldgate -c "SELECT version();"
+```
+
+If this works, your connection is fully configured!
 
 ### Authentication failed
 
