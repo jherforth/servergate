@@ -180,7 +180,9 @@ minetest.register_on_generated(function(minp,maxp,blockseed)
           -- Only accept this location if there's valid clearance
           if valid_clearance then
             -- A valid location was found on the heightmap
-            location = vn(randomx,heightmapy,randomz)
+            -- Add 6 to heightmap to ensure gate base is well above surface
+            -- (platform will still be placed underground at heightmapy - 1)
+            location = vn(randomx,heightmapy + 6,randomz)
             strategy = "heightmap"
             i = 10 -- break outer loop
           end
