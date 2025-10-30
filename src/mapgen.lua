@@ -304,7 +304,12 @@ minetest.register_on_generated(function(minp,maxp,blockseed)
 
     if beacon then
       local nodemeta = minetest.get_meta(beacon)
+
+      -- Generate and store UUID for this gate
+      local gate_uuid = servergate.generate_uuid()
+      nodemeta:set_string("servergate:gate_id", gate_uuid)
       nodemeta:set_string("servergate:source",minetest.pos_to_string(gate.position))
+
       if gate.destination then
         nodemeta:set_string("servergate:destination",minetest.pos_to_string(gate.destination))
         -- Swap to active beacon (support both telemosaic and servergate beacons)
@@ -321,6 +326,8 @@ minetest.register_on_generated(function(minp,maxp,blockseed)
           minetest.swap_node(beacon,{ name = "servergate:servergate_beacon_off", param2 = 0 })
         end
       end
+
+      minetest.log("action", "Servergate generated with UUID " .. gate_uuid .. " at " .. minetest.pos_to_string(gate.position))
     else
       minetest.log("warning","Unable to set beacon node meta for servergate at " .. minetest.pos_to_string(location))
     end

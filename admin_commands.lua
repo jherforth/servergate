@@ -25,11 +25,16 @@ minetest.register_chatcommand("worldgate_info", {
 
         if minetest.get_item_group(node.name, "servergate_beacon") > 0 or minetest.get_item_group(node.name, "telemosaic") > 0 then
           local meta = minetest.get_meta(node_pos)
+          local gate_id = meta:get_string("servergate:gate_id")
           local source = meta:get_string("servergate:source")
           local destination = meta:get_string("servergate:destination")
 
           if source and source ~= "" then
-            local info = "Servergate Beacon\nSource: " .. source .. "\nPosition: " .. minetest.pos_to_string(node_pos)
+            local info = "Servergate Beacon"
+            if gate_id and gate_id ~= "" then
+              info = info .. "\nGate ID: " .. gate_id
+            end
+            info = info .. "\nSource: " .. source .. "\nPosition: " .. minetest.pos_to_string(node_pos)
             if destination and destination ~= "" then
               info = info .. "\nDestination: " .. destination
             else
