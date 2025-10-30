@@ -294,7 +294,7 @@ minetest.register_on_generated(function(minp,maxp,blockseed)
       for dy = 2, 0, -1 do
         local beacon_location = location:add(vn(0,dy,0))
         local beacon_node = minetest.get_node(beacon_location)
-        if beacon_node and beacon_node.name:find("^telemosaic:beacon") then
+        if beacon_node and (beacon_node.name:find("^telemosaic:beacon") or beacon_node.name:find("^servergate:servergate_beacon")) then
           return beacon_location
         end
       end
@@ -305,7 +305,19 @@ minetest.register_on_generated(function(minp,maxp,blockseed)
       nodemeta:set_string("servergate:source",minetest.pos_to_string(gate.position))
       if gate.destination then
         nodemeta:set_string("servergate:destination",minetest.pos_to_string(gate.destination))
-        minetest.swap_node(beacon,{ name = "telemosaic:beacon", param2 = 0 })
+        -- Swap to active beacon (support both telemosaic and servergate beacons)
+        local beacon_node = minetest.get_node(beacon)
+        if beacon_node.name:find("^telemosaic:") then
+          minetest.swap_node(beacon,{ name = "telemosaic:beacon", param2 = 0 })
+        else
+          minetest.swap_node(beacon,{ name = "servergate:servergate_beacon", param2 = 0 })
+        end
+      else
+        -- No destination, leave beacon off
+        local beacon_node = minetest.get_node(beacon)
+        if beacon_node.name:find("^servergate:") and not beacon_node.name:find("_off$") then
+          minetest.swap_node(beacon,{ name = "servergate:servergate_beacon_off", param2 = 0 })
+        end
       end
     else
       minetest.log("warning","Unable to set beacon node meta for servergate at " .. minetest.pos_to_string(location))

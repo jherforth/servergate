@@ -23,15 +23,21 @@ minetest.register_chatcommand("worldgate_info", {
         local node_pos = pointed_thing.under
         local node = minetest.get_node(node_pos)
 
-        if minetest.get_item_group(node.name, "servergate_beacon") > 0 then
+        if minetest.get_item_group(node.name, "servergate_beacon") > 0 or minetest.get_item_group(node.name, "telemosaic") > 0 then
           local meta = minetest.get_meta(node_pos)
-          local gate_id = meta:get_string("worldgate:gate_id")
-          local source = meta:get_string("worldgate:source")
+          local source = meta:get_string("servergate:source")
+          local destination = meta:get_string("servergate:destination")
 
-          if gate_id and gate_id ~= "" then
-            return true, "Gate ID: " .. gate_id .. "\nSource: " .. source .. "\nPosition: " .. minetest.pos_to_string(node_pos)
+          if source and source ~= "" then
+            local info = "Servergate Beacon\nSource: " .. source .. "\nPosition: " .. minetest.pos_to_string(node_pos)
+            if destination and destination ~= "" then
+              info = info .. "\nDestination: " .. destination
+            else
+              info = info .. "\nDestination: Not linked"
+            end
+            return true, info
           else
-            return false, "This servergate beacon is not registered in the database"
+            return false, "This beacon is not a registered servergate"
           end
         end
       end
@@ -67,7 +73,7 @@ minetest.register_chatcommand("worldgate_link", {
         local node_pos = pointed_thing.under
         local node = minetest.get_node(node_pos)
 
-        if minetest.get_item_group(node.name, "servergate_beacon") > 0 then
+        if minetest.get_item_group(node.name, "servergate_beacon") > 0 or minetest.get_item_group(node.name, "telemosaic") > 0 then
           local success, err = servergate.link_gates_manual(node_pos, dest_gate_id, dest_server_id)
           if success then
             return true, "Servergate linking initiated. Check server log for confirmation."
