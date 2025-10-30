@@ -67,30 +67,30 @@ Use different names and URLs for each server:
 
 **Server Alpha:**
 ```
-worldgate.server_name = Server Alpha
-worldgate.server_url = minetest://alpha.example.com:30000
+servergate.server_name = Server Alpha
+servergate.server_url = minetest://alpha.example.com:30000
 
-worldgate.db_host = 192.168.1.100
-worldgate.db_port = 5432
-worldgate.db_name = worldgate
-worldgate.db_user = worldgate
-worldgate.db_password = your_secure_password
+servergate.db_host = 192.168.1.100
+servergate.db_port = 5432
+servergate.db_name = worldgate
+servergate.db_user = worldgate
+servergate.db_password = your_secure_password
 
-worldgate.native.link = false
+servergate.native.link = false
 ```
 
 **Server Beta:**
 ```
-worldgate.server_name = Server Beta
-worldgate.server_url = minetest://beta.example.com:30001
+servergate.server_name = Server Beta
+servergate.server_url = minetest://beta.example.com:30001
 
-worldgate.db_host = 192.168.1.100
-worldgate.db_port = 5432
-worldgate.db_name = worldgate
-worldgate.db_user = worldgate
-worldgate.db_password = your_secure_password
+servergate.db_host = 192.168.1.100
+servergate.db_port = 5432
+servergate.db_name = worldgate
+servergate.db_user = worldgate
+servergate.db_password = your_secure_password
 
-worldgate.native.link = false
+servergate.native.link = false
 ```
 
 ## Step 4: Start Servers and Explore

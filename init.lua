@@ -2,23 +2,23 @@
 -- Globals
 --
 
-worldgate = {
-  modpath = minetest.get_modpath("worldgate"),
+servergate = {
+  modpath = minetest.get_modpath("servergate"),
   gates = {},
   hash_index = {},
   forceload_index = {},
   settings = {
-    mapgen = minetest.settings:get_bool("worldgate.mapgen",true),
-    native = minetest.settings:get_bool("worldgate.native",true),
-    native_link = minetest.settings:get_bool("worldgate.native.link",false),
-    native_spread = tonumber(minetest.settings:get("worldgate.native.spread",1000) or 1000),
-    native_xzjitter = tonumber(minetest.settings:get("worldgate.native.xzjitter",12.5) or 12.5),
-    ymin = tonumber(minetest.settings:get("worldgate.ymin",-29900) or -29900),
-    ymax = tonumber(minetest.settings:get("worldgate.ymax",29900) or 29900),
-    underwaterspawn = minetest.settings:get_bool("worldgate.underwaterspawn",false),
-    midairspawn = minetest.settings:get_bool("worldgate.midairspawn",true),
-    breakage = tonumber(minetest.settings:get("worldgate.breakage",8) or 8),
-    beaconglow = minetest.settings:get_bool("worldgate.beaconglow",true),
+    mapgen = minetest.settings:get_bool("servergate.mapgen",true),
+    native = minetest.settings:get_bool("servergate.native",true),
+    native_link = minetest.settings:get_bool("servergate.native.link",false),
+    native_spread = tonumber(minetest.settings:get("servergate.native.spread",1000) or 1000),
+    native_xzjitter = tonumber(minetest.settings:get("servergate.native.xzjitter",12.5) or 12.5),
+    ymin = tonumber(minetest.settings:get("servergate.ymin",-29900) or -29900),
+    ymax = tonumber(minetest.settings:get("servergate.ymax",29900) or 29900),
+    underwaterspawn = minetest.settings:get_bool("servergate.underwaterspawn",false),
+    midairspawn = minetest.settings:get_bool("servergate.midairspawn",true),
+    breakage = tonumber(minetest.settings:get("servergate.breakage",8) or 8),
+    beaconglow = minetest.settings:get_bool("servergate.beaconglow",true),
   },
 }
 
@@ -27,7 +27,7 @@ worldgate = {
 --
 
 local function load(file)
-  dofile(worldgate.modpath .. "/src/" .. file .. ".lua")
+  dofile(servergate.modpath .. "/src/" .. file .. ".lua")
 end
 
 load("nodes")
@@ -42,4 +42,4 @@ load("link")
 load("spawn_gate")
 
 -- Load admin commands
-dofile(worldgate.modpath .. "/admin_commands.lua")
+dofile(servergate.modpath .. "/admin_commands.lua")

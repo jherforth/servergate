@@ -57,13 +57,13 @@ psql -U worldgate -d worldgate -c "\dt"
 - [ ] Worldgate mod installed in mods folder
 - [ ] PostgreSQL backend configured in world.mt
 - [ ] `world.mt` or `minetest.conf` configured with:
-  - [ ] `worldgate.server_name` = Unique name
-  - [ ] `worldgate.server_url` = Full connection URL
-  - [ ] `worldgate.db_host` = Database IP/hostname
-  - [ ] `worldgate.db_port` = 5432 (or custom port)
-  - [ ] `worldgate.db_name` = worldgate
-  - [ ] `worldgate.db_user` = worldgate
-  - [ ] `worldgate.db_password` = Your password
+  - [ ] `servergate.server_name` = Unique name
+  - [ ] `servergate.server_url` = Full connection URL
+  - [ ] `servergate.db_host` = Database IP/hostname
+  - [ ] `servergate.db_port` = 5432 (or custom port)
+  - [ ] `servergate.db_name` = worldgate
+  - [ ] `servergate.db_user` = worldgate
+  - [ ] `servergate.db_password` = Your password
 - [ ] Server starts without errors
 - [ ] Checked `debug.txt` for worldgate errors
 - [ ] Server registered with `/worldgate_register_server`
@@ -86,13 +86,13 @@ Server registered with ID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 - [ ] Worldgate mod installed in mods folder
 - [ ] PostgreSQL backend configured in world.mt
 - [ ] `world.mt` or `minetest.conf` configured with:
-  - [ ] `worldgate.server_name` = **Different** unique name
-  - [ ] `worldgate.server_url` = **Different** connection URL
-  - [ ] `worldgate.db_host` = **Same** database IP as Server 1
-  - [ ] `worldgate.db_port` = **Same** database port
-  - [ ] `worldgate.db_name` = **Same** database name
-  - [ ] `worldgate.db_user` = **Same** database user
-  - [ ] `worldgate.db_password` = **Same** database password
+  - [ ] `servergate.server_name` = **Different** unique name
+  - [ ] `servergate.server_url` = **Different** connection URL
+  - [ ] `servergate.db_host` = **Same** database IP as Server 1
+  - [ ] `servergate.db_port` = **Same** database port
+  - [ ] `servergate.db_name` = **Same** database name
+  - [ ] `servergate.db_user` = **Same** database user
+  - [ ] `servergate.db_password` = **Same** database password
 - [ ] Server starts without errors
 - [ ] Checked `debug.txt` for worldgate errors
 - [ ] Server registered with `/worldgate_register_server`
@@ -123,7 +123,7 @@ Repeat Server 2 checklist for each additional server:
 **Example Link Command:**
 ```lua
 -- From Server 1's console or chat (if admin)
-worldgate.link_gates_manual(
+servergate.link_gates_manual(
   {x=100, y=50, z=200},  -- Server 1 beacon position
   "destination-gate-id",  -- Server 2 gate ID
   "destination-server-id" -- Server 2 server ID
@@ -188,7 +188,7 @@ If something isn't working, check these common issues:
 - [ ] Test connection manually: `psql -U worldgate -d worldgate`
 - [ ] Check firewall isn't blocking port 5432
 - [ ] Verify credentials in `world.mt` match database user
-- [ ] Check `worldgate.db_host` is correct (use `localhost` if same machine)
+- [ ] Check `servergate.db_host` is correct (use `localhost` if same machine)
 
 ### Server Registration Failed
 
@@ -198,7 +198,7 @@ If something isn't working, check these common issues:
 
 **Solutions:**
 - [ ] Check database connection (see above)
-- [ ] Verify `worldgate.server_name` and `worldgate.server_url` are set
+- [ ] Verify `servergate.server_name` and `servergate.server_url` are set
 - [ ] Check for errors in `debug.txt`
 - [ ] Try restarting the server
 

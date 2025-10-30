@@ -21,14 +21,14 @@ This mod has been transformed from a local teleportation system (based on Telemo
   - Structure nodes for decoration
 
 - **Configuration**: Most settings remain
-  - `worldgate.mapgen` - Enable/disable generation
-  - `worldgate.native` - Native gate generation
-  - `worldgate.native.spread` - Distance between gates
-  - `worldgate.ymin/ymax` - Y coordinate limits
-  - `worldgate.underwaterspawn` - Underwater spawning
-  - `worldgate.midairspawn` - Midair spawning
-  - `worldgate.breakage` - Structure damage percentage
-  - `worldgate.beaconglow` - Beacon lighting
+  - `servergate.mapgen` - Enable/disable generation
+  - `servergate.native` - Native gate generation
+  - `servergate.native.spread` - Distance between gates
+  - `servergate.ymin/ymax` - Y coordinate limits
+  - `servergate.underwaterspawn` - Underwater spawning
+  - `servergate.midairspawn` - Midair spawning
+  - `servergate.breakage` - Structure damage percentage
+  - `servergate.beaconglow` - Beacon lighting
 
 ## What's Been Changed
 
@@ -36,7 +36,7 @@ This mod has been transformed from a local teleportation system (based on Telemo
 
 1. **Removed Telemosaic Dependency**
    - No longer requires the Telemosaic mod
-   - Created new servergate beacon nodes: `worldgate:servergate_beacon` and `worldgate:servergate_beacon_off`
+   - Created new servergate beacon nodes: `servergate:servergate_beacon` and `servergate:servergate_beacon_off`
    - Beacons now trigger server transfers instead of local teleportation
    - Servergate beacons are red to distinguish from worldgate/telemosaic beacons (blue)
    - Both mods can now coexist in the same world without conflicts
@@ -65,16 +65,16 @@ This mod has been transformed from a local teleportation system (based on Telemo
 ### 📝 Configuration Changes
 
 **New Settings:**
-- `worldgate.server_name` - Server identification
-- `worldgate.supabase_url` - Database URL
-- `worldgate.supabase_anon_key` - Database access key
+- `servergate.server_name` - Server identification
+- `servergate.supabase_url` - Database URL
+- `servergate.supabase_anon_key` - Database access key
 
 **Changed Defaults:**
-- `worldgate.native.link` - Now defaults to `false` (manual linking via database)
+- `servergate.native.link` - Now defaults to `false` (manual linking via database)
 
 **Removed Settings:**
-- `worldgate.superextenders` - No longer applicable
-- `worldgate.destroykeys` - No longer applicable
+- `servergate.superextenders` - No longer applicable
+- `servergate.destroykeys` - No longer applicable
 
 ### 📦 New Files
 

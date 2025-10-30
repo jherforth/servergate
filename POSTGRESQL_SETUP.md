@@ -254,18 +254,18 @@ backend = postgresql
 pgsql_connection = host=192.168.1.100 port=5432 user=worldgate password=your_password dbname=worldgate
 
 # Server identification (unique per server)
-worldgate.server_name = My Server Alpha
-worldgate.server_url = minetest://alpha.example.com:30000
+servergate.server_name = My Server Alpha
+servergate.server_url = minetest://alpha.example.com:30000
 
 # Database configuration (for mod queries)
-worldgate.db_host = 192.168.1.100
-worldgate.db_port = 5432
-worldgate.db_name = worldgate
-worldgate.db_user = worldgate
-worldgate.db_password = your_password
+servergate.db_host = 192.168.1.100
+servergate.db_port = 5432
+servergate.db_name = worldgate
+servergate.db_user = worldgate
+servergate.db_password = your_password
 
 # Recommended settings
-worldgate.native.link = false
+servergate.native.link = false
 ```
 
 ### Option 2: Using Mod Storage (Single Server)
@@ -274,8 +274,8 @@ If you don't need multi-server support, you can use local storage:
 
 ```ini
 # Just set the server identification
-worldgate.server_name = My Server
-worldgate.server_url = minetest://localhost:30000
+servergate.server_name = My Server
+servergate.server_url = minetest://localhost:30000
 ```
 
 ## Security Best Practices

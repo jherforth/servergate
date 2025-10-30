@@ -2,7 +2,7 @@
 # This name appears to players when they use worldgates
 # Make it unique for each server in your network
 # Examples: "Fantasy Server", "Desert World", "Space Station Alpha"
-worldgate.server_name (Server Name) string My Server
+servergate.server_name (Server Name) string My Server
 
 # Server URL that players connect to
 # This is the connection string shown to players for transferring servers
@@ -13,7 +13,7 @@ worldgate.server_name (Server Name) string My Server
 #   minetest://play.example.com:30000
 #   minetest://192.168.1.50:30000
 #   play.example.com:30000
-worldgate.server_url (Server URL) string minetest://localhost:30000
+servergate.server_url (Server URL) string minetest://localhost:30000
 
 # PostgreSQL database host
 # IP address or hostname of your PostgreSQL server
@@ -22,61 +22,61 @@ worldgate.server_url (Server URL) string minetest://localhost:30000
 #   192.168.1.100 (private network IP)
 #   10.0.0.50 (another private network IP)
 #   db.example.com (hostname)
-worldgate.db_host (Database Host) string localhost
+servergate.db_host (Database Host) string localhost
 
 # PostgreSQL database port
 # Default PostgreSQL port is 5432
 # Only change if you configured PostgreSQL on a different port
-worldgate.db_port (Database Port) int 5432 1 65535
+servergate.db_port (Database Port) int 5432 1 65535
 
 # Database name
 # The name of the PostgreSQL database created for worldgate
 # Default: worldgate
 # All servers in your network should use the SAME database name
-worldgate.db_name (Database Name) string worldgate
+servergate.db_name (Database Name) string worldgate
 
 # Database user
 # The PostgreSQL username for worldgate connections
 # Default: worldgate
 # All servers in your network should use the SAME database user
-worldgate.db_user (Database User) string worldgate
+servergate.db_user (Database User) string worldgate
 
 # Database password
 # The password for the worldgate PostgreSQL user
 # All servers in your network should use the SAME password
 # IMPORTANT: Keep this secure and never share publicly
 # Example: MySecureP@ssw0rd2024
-worldgate.db_password (Database Password) string
+servergate.db_password (Database Password) string
 
 # Enable mapgen? Unset this to prevent all worldgates from generating.
-worldgate.mapgen (Enable mapgen?) bool true
+servergate.mapgen (Enable mapgen?) bool true
 
 # Generate native worldgates? Native worldgates are the built-in worldgates that this mod provides by default.
-worldgate.native (Generate native worldgates?) bool true
+servergate.native (Generate native worldgates?) bool true
 
 # Link native worldgates? For server connector, set to false to link gates manually via database.
-worldgate.native.link (Link native worldgates?) bool false
+servergate.native.link (Link native worldgates?) bool false
 
 # Average number of nodes between native worldgates.
-worldgate.native.spread (Distance between native worldgates) int 1000 500 25000
+servergate.native.spread (Distance between native worldgates) int 1000 500 25000
 
 # The percentage of spread by which to randomly offset the x/z coordinates of native worldgates. A higher jitter randomly moves the gates further from their generated positions, thereby making their locations less predictable.
-worldgate.native.xzjitter (Native worldgate x/z jitter) float 12.5 0 25
+servergate.native.xzjitter (Native worldgate x/z jitter) float 12.5 0 25
 
-# The maximum y position of any worldgate. Any worldgates above this elevation will not generate.
-worldgate.ymax (Worldgate maximum y position) int 29900 0 29900
+# The maximum y position of any servergate. Any worldgates above this elevation will not generate.
+servergate.ymax (Worldgate maximum y position) int 29900 0 29900
 
-# The minimum y position of any worldgate. Any worldgates below this elevation will not generate.
-worldgate.ymin (Worldgate minimum y position) int -29900 -29900 0
+# The minimum y position of any servergate. Any worldgates below this elevation will not generate.
+servergate.ymin (Worldgate minimum y position) int -29900 -29900 0
 
 # Generate worldgates underwater? If set, worldgates can spawn on the ocean floor; if unset, worldgates will spawn on the water's surface.
-worldgate.underwaterspawn (Generate worldgates underwater?) bool false
+servergate.underwaterspawn (Generate worldgates underwater?) bool false
 
 # Generate worldgates in midair? If set, worldgates can be floating on their own in the air; if unset, gates that attempt to generate in the air will fail to generate.
-worldgate.midairspawn (Generate worldgates in midair?) bool true
+servergate.midairspawn (Generate worldgates in midair?) bool true
 
 # Percentage chance of a decorative structure node being broken when a gate generates.
-worldgate.breakage (Percent chance of structure damage) int 8 0 100
+servergate.breakage (Percent chance of structure damage) int 8 0 100
 
 # Glowing worldgate beacons?
-worldgate.beaconglow (Glowing beacons?) bool true
+servergate.beaconglow (Glowing beacons?) bool true

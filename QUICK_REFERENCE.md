@@ -20,7 +20,7 @@ Registers the current server in the shared database. Run once per server.
 
 ### Link Two Gates
 ```lua
-worldgate.link_gates_manual(
+servergate.link_gates_manual(
   {x=100, y=50, z=200},     -- Source beacon position
   "dest-gate-uuid",          -- Destination gate ID
   "dest-server-uuid"         -- Destination server ID
@@ -30,7 +30,7 @@ worldgate.link_gates_manual(
 ### Get Gate Info
 ```lua
 local meta = minetest.get_meta({x=100, y=50, z=200})
-print(meta:get_string("worldgate:gate_id"))
+print(meta:get_string("servergate:gate_id"))
 ```
 
 ---
@@ -148,29 +148,29 @@ sudo tail -n 50 /var/log/postgresql/postgresql-*.log
 
 ### Minimal world.mt
 ```ini
-worldgate.server_name = Fantasy Server
-worldgate.server_url = minetest://game.example.com:30000
-worldgate.db_host = localhost
-worldgate.db_port = 5432
-worldgate.db_name = worldgate
-worldgate.db_user = worldgate
-worldgate.db_password = your_secure_password
+servergate.server_name = Fantasy Server
+servergate.server_url = minetest://game.example.com:30000
+servergate.db_host = localhost
+servergate.db_port = 5432
+servergate.db_name = worldgate
+servergate.db_user = worldgate
+servergate.db_password = your_secure_password
 ```
 
 ### Disable Gate Generation
 ```ini
-worldgate.mapgen = false
+servergate.mapgen = false
 ```
 
 ### Adjust Gate Spacing
 ```ini
-worldgate.native.spread = 2000
+servergate.native.spread = 2000
 ```
 
 ### Change Height Limits
 ```ini
-worldgate.ymin = -5000
-worldgate.ymax = 5000
+servergate.ymin = -5000
+servergate.ymax = 5000
 ```
 
 ---
@@ -272,7 +272,7 @@ ALTER USER worldgate WITH PASSWORD 'new_password';
 -- In server console, force re-register gate
 local pos = {x=100, y=50, z=200}
 local meta = minetest.get_meta(pos)
-meta:set_string("worldgate:gate_id", "")  -- Clear ID
+meta:set_string("servergate:gate_id", "")  -- Clear ID
 -- Then restart server to regenerate
 ```
 

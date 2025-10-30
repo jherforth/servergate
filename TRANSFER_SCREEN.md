@@ -114,9 +114,9 @@ worldgate/
 ### How It Works
 
 1. Player right-clicks servergate beacon
-2. `worldgate.initiate_transfer()` called in `server_api.lua`
+2. `servergate.initiate_transfer()` called in `server_api.lua`
 3. Database queried for destination server info
-4. `worldgate.transfer_screen.show()` displays formspec
+4. `servergate.transfer_screen.show()` displays formspec
 5. Formspec uses `worldgate_transfer.png` as background
 6. Player sees visual screen + chat instructions
 

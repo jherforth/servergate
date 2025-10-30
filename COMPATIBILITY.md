@@ -48,7 +48,7 @@ This mod has been designed to coexist peacefully with the original worldgate mod
 ### Visual Differences
 
 **Servergate Beacons (this mod):**
-- Node names: `worldgate:servergate_beacon` and `worldgate:servergate_beacon_off`
+- Node names: `servergate:servergate_beacon` and `servergate:servergate_beacon_off`
 - Color: Red (`#FF0000` active, `#330000` inactive)
 - Purpose: Cross-server player transfers
 - Right-click shows destination server URL
@@ -69,8 +69,8 @@ For worlds that used the older version of this mod:
 
 ```lua
 -- Aliases are automatically registered
-minetest.register_alias("worldgate:beacon", "worldgate:servergate_beacon")
-minetest.register_alias("worldgate:beacon_off", "worldgate:servergate_beacon_off")
+minetest.register_alias("servergate:beacon", "servergate:servergate_beacon")
+minetest.register_alias("servergate:beacon_off", "servergate:servergate_beacon_off")
 ```
 
 Old beacons will automatically convert to the new servergate beacons.
@@ -129,7 +129,7 @@ For a clean server network:
 2. **Multiple Servers**: Use both:
    - Telemosaic for convenient local teleportation
    - Servergates for traveling between servers
-3. **Pure Server Network**: Disable `worldgate.native.link` and use only servergates
+3. **Pure Server Network**: Disable `servergate.native.link` and use only servergates
 
 ## Technical Details
 
@@ -140,8 +140,8 @@ The mod registers servergates before checking for telemosaic, ensuring both can 
 ### Metadata Keys
 
 Servergate beacons use:
-- `worldgate:gate_id` - UUID in database
-- `worldgate:source` - Original generation position
+- `servergate:gate_id` - UUID in database
+- `servergate:source` - Original generation position
 
 These don't conflict with telemosaic's metadata keys.
 

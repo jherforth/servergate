@@ -68,7 +68,7 @@ minetest.register_chatcommand("worldgate_link", {
         local node = minetest.get_node(node_pos)
 
         if minetest.get_item_group(node.name, "servergate_beacon") > 0 then
-          local success, err = worldgate.link_gates_manual(node_pos, dest_gate_id, dest_server_id)
+          local success, err = servergate.link_gates_manual(node_pos, dest_gate_id, dest_server_id)
           if success then
             return true, "Servergate linking initiated. Check server log for confirmation."
           else
@@ -91,7 +91,7 @@ minetest.register_chatcommand("worldgate_list", {
     local count = 0
     local output = "Registered worldgates:\n"
 
-    for _, gate in ipairs(worldgate.gates) do
+    for _, gate in ipairs(servergate.gates) do
       count = count + 1
       output = output .. count .. ". Position: " .. minetest.pos_to_string(gate.position) .. "\n"
     end

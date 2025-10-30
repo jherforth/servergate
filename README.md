@@ -66,21 +66,21 @@ Add these settings to your `minetest.conf` on each server (see `minetest.conf.ex
 
 ```
 # Server identification
-worldgate.server_name = My Server Alpha
+servergate.server_name = My Server Alpha
 
 # URL players should connect to
-worldgate.server_url = minetest://play.example.com:30000
+servergate.server_url = minetest://play.example.com:30000
 
 # PostgreSQL backend (in world.mt)
 backend = postgresql
 pgsql_connection = host=192.168.1.100 port=5432 user=worldgate password=xxx dbname=worldgate
 
 # Database connection (for mod queries)
-worldgate.db_host = 192.168.1.100
-worldgate.db_port = 5432
-worldgate.db_name = worldgate
-worldgate.db_user = worldgate
-worldgate.db_password = your_secure_password
+servergate.db_host = 192.168.1.100
+servergate.db_port = 5432
+servergate.db_name = worldgate
+servergate.db_user = worldgate
+servergate.db_password = your_secure_password
 ```
 
 ### 4. Transfer Screen Image (Optional)
@@ -98,7 +98,7 @@ See [TRANSFER_SCREEN.md](TRANSFER_SCREEN.md) for detailed setup and customizatio
 Gates can be linked using the Lua API:
 
 ```lua
-worldgate.link_gates_manual(source_beacon_pos, destination_gate_id, destination_server_id)
+servergate.link_gates_manual(source_beacon_pos, destination_gate_id, destination_server_id)
 ```
 
 Where:
@@ -108,19 +108,19 @@ Where:
 
 ## Configuration Options
 
-- `worldgate.mapgen` - Enable/disable worldgate generation (default: true)
-- `worldgate.native` - Enable native gate generation (default: true)
-- `worldgate.native.link` - Auto-link gates locally (default: false for server connector)
-- `worldgate.native.spread` - Distance between gates in nodes (default: 1000)
-- `worldgate.ymin` - Minimum Y coordinate for gates (default: -29900)
-- `worldgate.ymax` - Maximum Y coordinate for gates (default: 29900)
-- `worldgate.beaconglow` - Make beacons emit light (default: true)
+- `servergate.mapgen` - Enable/disable worldgate generation (default: true)
+- `servergate.native` - Enable native gate generation (default: true)
+- `servergate.native.link` - Auto-link gates locally (default: false for server connector)
+- `servergate.native.spread` - Distance between gates in nodes (default: 1000)
+- `servergate.ymin` - Minimum Y coordinate for gates (default: -29900)
+- `servergate.ymax` - Maximum Y coordinate for gates (default: 29900)
+- `servergate.beaconglow` - Make beacons emit light (default: true)
 
 ## Important Limitations
 
 **⚠️ Inventory Does Not Transfer**
 
-Player inventories do **not** transfer between servers. When players transfer through a worldgate:
+Player inventories do **not** transfer between servers. When players transfer through a servergate:
 - **Player keeps:** Their username, authentication
 - **Player loses:** All inventory items, armor, wielded items
 
