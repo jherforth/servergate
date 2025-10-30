@@ -328,6 +328,24 @@ minetest.register_on_generated(function(minp,maxp,blockseed)
       end
 
       minetest.log("action", "Servergate generated with UUID " .. gate_uuid .. " at " .. minetest.pos_to_string(gate.position))
+
+      -- Register gate in database after a short delay to ensure beacon is fully initialized
+      minetest.after(2, function()
+        if servergate.db and servergate.db.available then
+          servergate.db.register_gate(
+            gate_uuid,
+            gate.position,
+            gate.base,
+            gate.decor,
+            gate.quality,
+            function(success, err)
+              if not success then
+                minetest.log("error", "Failed to register gate in database: " .. tostring(err))
+              end
+            end
+          )
+        end
+      end)
     else
       minetest.log("warning","Unable to set beacon node meta for servergate at " .. minetest.pos_to_string(location))
     end

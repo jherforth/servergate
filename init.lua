@@ -21,7 +21,15 @@ servergate = {
     beaconglow = minetest.settings:get_bool("servergate.beaconglow",true),
     superextenders = minetest.settings:get_bool("servergate.superextenders",false),
     destroykeys = minetest.settings:get_bool("servergate.destroykeys",false),
+    server_name = minetest.settings:get("servergate.server_name") or "My Server",
+    server_url = minetest.settings:get("servergate.server_url") or "minetest://localhost:30000",
+    db_host = minetest.settings:get("servergate.db_host") or "localhost",
+    db_port = tonumber(minetest.settings:get("servergate.db_port") or 5432),
+    db_name = minetest.settings:get("servergate.db_name") or "worldgate",
+    db_user = minetest.settings:get("servergate.db_user") or "worldgate",
+    db_password = minetest.settings:get("servergate.db_password") or "",
   },
+  server_id = nil,
 }
 
 --
@@ -34,6 +42,7 @@ end
 
 load("nodes")
 load("functions")
+load("database")
 load("gates")
 load("server_api")
 load("transfer_screen")

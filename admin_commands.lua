@@ -54,8 +54,8 @@ minetest.register_chatcommand("worldgate_info", {
 
 -- Command to link gates
 minetest.register_chatcommand("worldgate_link", {
-  params = "<destination_gate_id> <destination_server_id>",
-  description = "Link the worldgate you're looking at to another gate",
+  params = "<destination_gate_id>",
+  description = "Link the worldgate you're looking at to another gate by its UUID",
   privs = {server = true},
   func = function(name, param)
     local player = minetest.get_player_by_name(name)
@@ -63,9 +63,13 @@ minetest.register_chatcommand("worldgate_link", {
       return false, "Player not found"
     end
 
-    local dest_gate_id, dest_server_id = param:match("^(%S+)%s+(%S+)$")
-    if not dest_gate_id or not dest_server_id then
-      return false, "Usage: /worldgate_link <destination_gate_id> <destination_server_id>"
+    local dest_gate_id = param:match("^(%S+)$")
+    if not dest_gate_id then
+      return false, "Usage: /worldgate_link <destination_gate_id>\nExample: /worldgate_link 12345678-abcd-4xxx-yxxx-xxxxxxxxxxxx"
+    end
+
+    if not servergate.db or not servergate.db.available then
+      return false, "Database not available. Configure PostgreSQL to use gate linking."
     end
 
     local pos = player:get_pos()
@@ -79,12 +83,51 @@ minetest.register_chatcommand("worldgate_link", {
         local node = minetest.get_node(node_pos)
 
         if minetest.get_item_group(node.name, "servergate_beacon") > 0 or minetest.get_item_group(node.name, "telemosaic") > 0 then
-          local success, err = servergate.link_gates_manual(node_pos, dest_gate_id, dest_server_id)
-          if success then
-            return true, "Servergate linking initiated. Check server log for confirmation."
-          else
-            return false, err or "Failed to link servergates"
+          local meta = minetest.get_meta(node_pos)
+          local source_gate_id = meta:get_string("servergate:gate_id")
+
+          if not source_gate_id or source_gate_id == "" then
+            return false, "This gate has no UUID. It may not be registered in the database."
           end
+
+          -- Get destination gate info from database to find its server
+          servergate.db.get_gate_info(dest_gate_id, function(success, result)
+            if not success or not result or #result == 0 then
+              minetest.chat_send_player(name, "Error: Destination gate not found in database")
+              return
+            end
+
+            local dest_gate = result[1]
+            local dest_server_id = dest_gate.server_id
+
+            -- Link the gates in the database
+            servergate.db.link_gates(source_gate_id, dest_gate_id, dest_server_id, function(link_success, link_err)
+              if link_success then
+                -- Update local beacon metadata
+                meta:set_string("servergate:destination_gate_id", dest_gate_id)
+                meta:set_string("servergate:destination_server_id", dest_server_id)
+                if dest_gate.dest_server_url then
+                  meta:set_string("servergate:destination_url", dest_gate.dest_server_url)
+                end
+
+                -- Turn on the beacon
+                local beacon_node = minetest.get_node(node_pos)
+                if beacon_node.name:find("_off$") then
+                  if beacon_node.name:find("^telemosaic:") then
+                    minetest.swap_node(node_pos, { name = "telemosaic:beacon", param2 = 0 })
+                  else
+                    minetest.swap_node(node_pos, { name = "servergate:servergate_beacon", param2 = 0 })
+                  end
+                end
+
+                minetest.chat_send_player(name, "Gate linked successfully to " .. (dest_gate.dest_server_name or "destination server"))
+              else
+                minetest.chat_send_player(name, "Error linking gates: " .. tostring(link_err))
+              end
+            end)
+          end)
+
+          return true, "Linking gate to " .. dest_gate_id .. "..."
         end
       end
     end
@@ -96,21 +139,41 @@ minetest.register_chatcommand("worldgate_link", {
 -- Command to list all gates on this server
 minetest.register_chatcommand("worldgate_list", {
   params = "",
-  description = "List all worldgates registered on this server",
+  description = "List all worldgates registered on this server from the database",
   privs = {server = true},
   func = function(name, param)
-    local count = 0
-    local output = "Registered worldgates:\n"
-
-    for _, gate in ipairs(servergate.gates) do
-      count = count + 1
-      output = output .. count .. ". Position: " .. minetest.pos_to_string(gate.position) .. "\n"
+    if not servergate.db or not servergate.db.available or not servergate.server_id then
+      return false, "Database not available or server not registered"
     end
 
-    if count == 0 then
-      return false, "No worldgates registered yet"
-    end
+    local sql = string.format([[
+      SELECT id, position, quality,
+             destination_gate_id IS NOT NULL as is_linked
+      FROM worldgates
+      WHERE server_id = '%s'
+      ORDER BY created_at;
+    ]], servergate.server_id)
 
-    return true, output
+    servergate.db.query(sql, function(success, result)
+      if not success then
+        minetest.chat_send_player(name, "Error querying database: " .. tostring(result))
+        return
+      end
+
+      if not result or #result == 0 then
+        minetest.chat_send_player(name, "No worldgates registered yet")
+        return
+      end
+
+      local output = "Registered worldgates on this server:\n"
+      for i, gate in ipairs(result) do
+        local linked_status = gate.is_linked == "t" and "linked" or "not linked"
+        output = output .. i .. ". " .. gate.id:sub(1, 8) .. "... at " .. gate.position .. " (" .. linked_status .. ")\n"
+      end
+
+      minetest.chat_send_player(name, output)
+    end)
+
+    return true, "Fetching gate list from database..."
   end,
 })
