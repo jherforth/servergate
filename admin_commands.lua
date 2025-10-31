@@ -99,16 +99,15 @@ minetest.register_chatcommand("worldgate_link", {
 
             local dest_gate = result[1]
             local dest_server_id = dest_gate.server_id
+            local dest_server_url = dest_gate.server_url
 
-            -- Link the gates in the database
+            -- Link the gates in the database (bidirectional)
             servergate.db.link_gates(source_gate_id, dest_gate_id, dest_server_id, function(link_success, link_err)
               if link_success then
                 -- Update local beacon metadata
                 meta:set_string("servergate:destination_gate_id", dest_gate_id)
                 meta:set_string("servergate:destination_server_id", dest_server_id)
-                if dest_gate.dest_server_url then
-                  meta:set_string("servergate:destination_url", dest_gate.dest_server_url)
-                end
+                meta:set_string("servergate:destination_url", dest_server_url)
 
                 -- Turn on the beacon
                 local beacon_node = minetest.get_node(node_pos)
@@ -120,7 +119,7 @@ minetest.register_chatcommand("worldgate_link", {
                   end
                 end
 
-                minetest.chat_send_player(name, "Gate linked successfully to " .. (dest_gate.dest_server_name or "destination server"))
+                minetest.chat_send_player(name, "Gate linked successfully to " .. (dest_gate.server_name or "destination server") .. " (bidirectional)")
               else
                 minetest.chat_send_player(name, "Error linking gates: " .. tostring(link_err))
               end

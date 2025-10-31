@@ -174,7 +174,7 @@ function servergate.db.register_gate(gate_id, position, base, decor, quality, ca
   end)
 end
 
--- Link two gates together
+-- Link two gates together (bidirectional)
 function servergate.db.link_gates(source_gate_id, dest_gate_id, dest_server_id, callback)
   if not servergate.db.available then
     if callback then
@@ -183,15 +183,42 @@ function servergate.db.link_gates(source_gate_id, dest_gate_id, dest_server_id, 
     return
   end
 
-  local sql = string.format([[
-    UPDATE worldgates
-    SET destination_gate_id = '%s',
-        destination_server_id = '%s',
-        updated_at = CURRENT_TIMESTAMP
-    WHERE id = '%s';
-  ]], dest_gate_id, dest_server_id, source_gate_id)
+  -- First get the source gate's server_id for the reverse link
+  local get_source_sql = string.format([[
+    SELECT server_id FROM worldgates WHERE id = '%s';
+  ]], source_gate_id)
 
-  servergate.db.query(sql, callback)
+  servergate.db.query(get_source_sql, function(success, result)
+    if not success or not result or #result == 0 then
+      if callback then
+        callback(false, "Source gate not found")
+      end
+      return
+    end
+
+    local source_server_id = result[1].server_id
+
+    -- Update both gates bidirectionally
+    local sql = string.format([[
+      UPDATE worldgates
+      SET destination_gate_id = CASE
+          WHEN id = '%s' THEN '%s'
+          WHEN id = '%s' THEN '%s'
+        END,
+        destination_server_id = CASE
+          WHEN id = '%s' THEN '%s'
+          WHEN id = '%s' THEN '%s'
+        END,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE id IN ('%s', '%s');
+    ]], source_gate_id, dest_gate_id,
+        dest_gate_id, source_gate_id,
+        source_gate_id, dest_server_id,
+        dest_gate_id, source_server_id,
+        source_gate_id, dest_gate_id)
+
+    servergate.db.query(sql, callback)
+  end)
 end
 
 -- Get gate information from database

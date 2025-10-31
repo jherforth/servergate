@@ -136,35 +136,35 @@ local function on_beacon_interact(pos, node, player, itemstack, pointed_thing)
   end
 end
 
--- Track player positions to detect jumping on beacons
-local player_last_pos = {}
-local player_interaction_cooldown = {}
+-- Track punch interactions on beacons (crouch-punch)
+local player_punch_cooldown = {}
 
-minetest.register_globalstep(function(dtime)
-  for _, player in ipairs(minetest.get_connected_players()) do
-    local player_name = player:get_player_name()
-    local pos = player:get_pos()
-    local node_below = minetest.get_node({x=pos.x, y=pos.y-1, z=pos.z})
+minetest.register_on_punchnode(function(pos, node, puncher, pointed_thing)
+  if not puncher or not puncher:is_player() then
+    return
+  end
 
-    -- Check if player is standing on a beacon
-    if node_below.name == "servergate:servergate_beacon" or node_below.name == "servergate:servergate_beacon_off" then
-      local beacon_pos = {x=math.floor(pos.x+0.5), y=math.floor(pos.y-1+0.5), z=math.floor(pos.z+0.5)}
+  -- Check if punching a beacon
+  if node.name ~= "servergate:servergate_beacon" and node.name ~= "servergate:servergate_beacon_off" then
+    return
+  end
 
-      -- Check cooldown (prevent spam)
-      local cooldown_key = player_name .. minetest.pos_to_string(beacon_pos)
-      local current_time = minetest.get_us_time() / 1000000
+  local player_name = puncher:get_player_name()
+  local player_control = puncher:get_player_control()
 
-      if not player_interaction_cooldown[cooldown_key] or
-         (current_time - player_interaction_cooldown[cooldown_key]) > 2 then
+  -- Only trigger on crouch-punch
+  if not player_control.sneak then
+    return
+  end
 
-        -- Detect if player jumped (y velocity or control check)
-        local player_control = player:get_player_control()
-        if player_control.jump then
-          player_interaction_cooldown[cooldown_key] = current_time
-          on_beacon_interact(beacon_pos, node_below, player, nil, nil)
-        end
-      end
-    end
+  -- Check cooldown (prevent spam)
+  local cooldown_key = player_name .. minetest.pos_to_string(pos)
+  local current_time = minetest.get_us_time() / 1000000
+
+  if not player_punch_cooldown[cooldown_key] or
+     (current_time - player_punch_cooldown[cooldown_key]) > 2 then
+    player_punch_cooldown[cooldown_key] = current_time
+    on_beacon_interact(pos, node, puncher, nil, nil)
   end
 end)
 
