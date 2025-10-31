@@ -193,70 +193,19 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
   if formname == "servergate:travel" then
     if fields.go then
-      -- Debug: confirm we received the GO signal
-      minetest.log("action", "[ServerGate] GO button pressed by " .. player_name)
-
-      -- Wrap everything in pcall to catch any crashes
-      local success, err = pcall(function()
-        local player_obj = minetest.get_player_by_name(player_name)
-        if not player_obj then
-          return
-        end
-
+      local player_obj = minetest.get_player_by_name(player_name)
+      if player_obj then
         local dest_url = context.dest_url
 
-        -- Validate URL format
         if not dest_url or dest_url == "" or dest_url == "unknown" then
           minetest.chat_send_player(player_name, "Error: Invalid destination URL")
-          return
+          player_context[player_name] = nil
+          return true
         end
 
-        servergate.log("info", "Player " .. player_name .. " attempting transfer to: " .. dest_url)
-        minetest.chat_send_player(player_name, "Initiating transfer to: " .. dest_url)
-
-        -- Check if send_player_to_server is available
-        if not minetest.send_player_to_server then
-          servergate.log("error", "minetest.send_player_to_server is not available - check server_network settings")
-          minetest.chat_send_player(player_name, "Server transfer not enabled.")
-          minetest.chat_send_player(player_name, "Admin: Enable server_network_enabled in minetest.conf")
-          return
-        end
-
-        -- Use Minetest's send_player_to_server API
-        minetest.after(1.0, function()
-          local success2, err2 = pcall(function()
-            local transfer_player = minetest.get_player_by_name(player_name)
-            if not transfer_player then
-              return
-            end
-
-            -- send_player_to_server takes (player, address)
-            -- The address should be just the host:port part
-            local address = dest_url:gsub("^minetest://", "")
-
-            servergate.log("info", "Sending player to: " .. address)
-            local result = minetest.send_player_to_server(transfer_player, address)
-
-            if not result then
-              servergate.log("warning", "Transfer request returned false for " .. player_name)
-              minetest.chat_send_player(player_name, "Transfer failed. Server may not be in allowed list.")
-              minetest.chat_send_player(player_name, "Try: /connect " .. dest_url)
-            else
-              servergate.log("info", "Transfer initiated successfully for " .. player_name)
-            end
-          end)
-
-          if not success2 then
-            servergate.log("error", "Transfer error for " .. player_name .. ": " .. tostring(err2))
-            minetest.chat_send_player(player_name, "Transfer failed: " .. tostring(err2))
-            minetest.chat_send_player(player_name, "Try manually: /connect " .. dest_url)
-          end
-        end)
-      end)
-
-      if not success then
-        servergate.log("error", "Formspec handler error: " .. tostring(err))
-        minetest.chat_send_player(player_name, "Error: " .. tostring(err))
+        servergate.log("info", "Player " .. player_name .. " requested connection info for: " .. dest_url)
+        minetest.chat_send_player(player_name, "To travel to this destination, use:")
+        minetest.chat_send_player(player_name, "/connect " .. dest_url)
       end
 
       player_context[player_name] = nil
