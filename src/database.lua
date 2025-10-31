@@ -25,8 +25,14 @@ end
 -- Test if we can load the luasql.postgres library
 local pgsql_status, luasql = pcall(require, "luasql.postgres")
 if not pgsql_status then
-  minetest.log("warning", "Servergate: PostgreSQL library not available: " .. tostring(luasql))
-  minetest.log("warning", "Servergate: Install luasql-postgres package")
+  -- Check if this is a mod security issue
+  if luasql and luasql:match("require.*disabled") then
+    minetest.log("warning", "Servergate: PostgreSQL blocked by mod security")
+    minetest.log("warning", "Servergate: Add 'worldgate' to secure.trusted_mods in minetest.conf")
+  else
+    minetest.log("warning", "Servergate: PostgreSQL library not available: " .. tostring(luasql))
+    minetest.log("warning", "Servergate: Install luasql-postgres package")
+  end
   servergate.db.available = false
   return
 end
