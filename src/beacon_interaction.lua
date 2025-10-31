@@ -144,8 +144,13 @@ minetest.register_on_punchnode(function(pos, node, puncher, pointed_thing)
     return
   end
 
-  -- Check if punching a beacon
-  if node.name ~= "servergate:servergate_beacon" and node.name ~= "servergate:servergate_beacon_off" then
+  -- Check if punching a beacon (telemosaic or servergate)
+  local is_beacon = node.name:find("^telemosaic:beacon") or
+                    node.name:find("^servergate:servergate_beacon") or
+                    minetest.get_item_group(node.name, "telemosaic") > 0 or
+                    minetest.get_item_group(node.name, "servergate_beacon") > 0
+
+  if not is_beacon then
     return
   end
 
@@ -251,10 +256,22 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 end)
 
 -- Update beacon node definitions to handle right-click
-minetest.override_item("servergate:servergate_beacon", {
-  on_rightclick = on_beacon_interact,
-})
+-- Override both servergate and telemosaic beacons
+local beacon_types = {
+  "servergate:servergate_beacon",
+  "servergate:servergate_beacon_off",
+  "telemosaic:beacon",
+  "telemosaic:beacon_off",
+  "telemosaic:beacon_protected",
+  "telemosaic:beacon_err",
+  "telemosaic:beacon_err_protected",
+  "telemosaic:beacon_disabled",
+  "telemosaic:beacon_disabled_protected",
+  "telemosaic:beacon_off_protected",
+}
 
-minetest.override_item("servergate:servergate_beacon_off", {
-  on_rightclick = on_beacon_interact,
-})
+for _, beacon_name in ipairs(beacon_types) do
+  minetest.override_item(beacon_name, {
+    on_rightclick = on_beacon_interact,
+  })
+end
