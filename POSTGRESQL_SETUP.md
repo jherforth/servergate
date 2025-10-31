@@ -513,11 +513,47 @@ GRANT USAGE ON SCHEMA public TO worldgate;
 
 ### Permission denied errors
 
+**Common issue:** When tables are created by the `postgres` user, other database users (like `worldgate`) don't automatically get access to them.
+
+#### Symptoms:
+```
+ERROR: permission denied for table servers
+ERROR: permission denied for table worldgates
+```
+
+#### Solution:
+
+**Option 1: Using pgAdmin (GUI)**
+
+1. Open pgAdmin and connect to your `worldgate` database
+2. Open the Query Tool (Tools → Query Tool, or right-click database → Query Tool)
+3. Run this SQL:
+   ```sql
+   GRANT SELECT, INSERT, UPDATE, DELETE ON servers, worldgates, transfer_logs TO worldgate;
+   ```
+4. Click Execute (⚡ lightning bolt icon) or press F5
+
+**Option 2: Using psql (Command Line)**
+
+```bash
+# Connect as postgres superuser
+sudo -u postgres psql worldgate
+
+# Grant permissions
+GRANT SELECT, INSERT, UPDATE, DELETE ON servers, worldgates, transfer_logs TO worldgate;
+
+# Exit
+\q
+```
+
+**Option 3: Grant on ALL tables (if you create more tables later)**
+
 ```sql
--- Grant necessary permissions
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO worldgate;
 GRANT USAGE ON SCHEMA public TO worldgate;
 ```
+
+After granting permissions, restart your Minetest/Luanti server.
 
 ### Slow queries
 
