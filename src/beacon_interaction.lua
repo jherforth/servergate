@@ -195,15 +195,35 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     if fields.go then
       local player_obj = minetest.get_player_by_name(player_name)
       if player_obj then
-        minetest.chat_send_player(player_name, "Initiating transfer to: " .. context.dest_url)
+        local dest_url = context.dest_url
+
+        -- Validate URL format
+        if not dest_url or dest_url == "" or dest_url == "unknown" then
+          minetest.chat_send_player(player_name, "Error: Invalid destination URL")
+          player_context[player_name] = nil
+          return true
+        end
+
+        servergate.log("info", "Player " .. player_name .. " attempting transfer to: " .. dest_url)
+        minetest.chat_send_player(player_name, "Initiating transfer to: " .. dest_url)
 
         -- Use Minetest's request_player_transfer API
         minetest.after(0.5, function()
           local transfer_player = minetest.get_player_by_name(player_name)
           if transfer_player then
-            local success = minetest.request_player_transfer(transfer_player, context.dest_url)
+            local success, err = pcall(function()
+              return minetest.request_player_transfer(transfer_player, dest_url)
+            end)
+
             if not success then
-              minetest.chat_send_player(player_name, "Transfer failed. Please manually connect with: /connect " .. context.dest_url)
+              servergate.log("error", "Transfer error for " .. player_name .. ": " .. tostring(err))
+              minetest.chat_send_player(player_name, "Transfer failed: " .. tostring(err))
+              minetest.chat_send_player(player_name, "Try manually: /connect " .. dest_url)
+            elseif not err then
+              servergate.log("warning", "Transfer request returned false for " .. player_name)
+              minetest.chat_send_player(player_name, "Transfer request failed. Try: /connect " .. dest_url)
+            else
+              servergate.log("info", "Transfer initiated successfully for " .. player_name)
             end
           end
         end)
