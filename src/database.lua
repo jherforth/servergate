@@ -22,8 +22,8 @@ if not check_pgsql_config() then
   return
 end
 
--- Request insecure environment to load C libraries
-local ie = minetest.request_insecure_environment()
+-- Use the insecure environment stored in init.lua
+local ie = servergate.insecure_env
 if not ie then
   minetest.log("warning", "Servergate: Cannot access insecure environment")
   minetest.log("warning", "Servergate: Add 'servergate' to secure.trusted_mods in minetest.conf")
