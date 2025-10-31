@@ -214,15 +214,15 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
         servergate.log("info", "Player " .. player_name .. " attempting transfer to: " .. dest_url)
         minetest.chat_send_player(player_name, "Initiating transfer to: " .. dest_url)
 
-        -- Check if request_player_transfer is available
-        if not minetest.request_player_transfer then
-          servergate.log("error", "minetest.request_player_transfer is not available")
-          minetest.chat_send_player(player_name, "Automatic transfer not available.")
-          minetest.chat_send_player(player_name, "Please use: /connect " .. dest_url)
+        -- Check if send_player_to_server is available
+        if not minetest.send_player_to_server then
+          servergate.log("error", "minetest.send_player_to_server is not available - check server_network settings")
+          minetest.chat_send_player(player_name, "Server transfer not enabled.")
+          minetest.chat_send_player(player_name, "Admin: Enable server_network_enabled in minetest.conf")
           return
         end
 
-        -- Use Minetest's request_player_transfer API
+        -- Use Minetest's send_player_to_server API
         minetest.after(1.0, function()
           local success2, err2 = pcall(function()
             local transfer_player = minetest.get_player_by_name(player_name)
@@ -230,11 +230,17 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
               return
             end
 
-            local result = minetest.request_player_transfer(transfer_player, dest_url)
+            -- send_player_to_server takes (player, address)
+            -- The address should be just the host:port part
+            local address = dest_url:gsub("^minetest://", "")
+
+            servergate.log("info", "Sending player to: " .. address)
+            local result = minetest.send_player_to_server(transfer_player, address)
 
             if not result then
               servergate.log("warning", "Transfer request returned false for " .. player_name)
-              minetest.chat_send_player(player_name, "Transfer request failed. Try: /connect " .. dest_url)
+              minetest.chat_send_player(player_name, "Transfer failed. Server may not be in allowed list.")
+              minetest.chat_send_player(player_name, "Try: /connect " .. dest_url)
             else
               servergate.log("info", "Transfer initiated successfully for " .. player_name)
             end
