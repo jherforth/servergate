@@ -22,17 +22,20 @@ if not check_pgsql_config() then
   return
 end
 
+-- Request insecure environment to load C libraries
+local ie = minetest.request_insecure_environment()
+if not ie then
+  minetest.log("warning", "Servergate: Cannot access insecure environment")
+  minetest.log("warning", "Servergate: Add 'servergate' to secure.trusted_mods in minetest.conf")
+  servergate.db.available = false
+  return
+end
+
 -- Test if we can load the luasql.postgres library
-local pgsql_status, luasql = pcall(require, "luasql.postgres")
+local pgsql_status, luasql = pcall(ie.require, "luasql.postgres")
 if not pgsql_status then
-  -- Check if this is a mod security issue
-  if luasql and luasql:match("require.*disabled") then
-    minetest.log("warning", "Servergate: PostgreSQL blocked by mod security")
-    minetest.log("warning", "Servergate: Add 'servergate' to secure.trusted_mods in minetest.conf")
-  else
-    minetest.log("warning", "Servergate: PostgreSQL library not available: " .. tostring(luasql))
-    minetest.log("warning", "Servergate: Install luasql-postgres package")
-  end
+  minetest.log("warning", "Servergate: PostgreSQL library not available: " .. tostring(luasql))
+  minetest.log("warning", "Servergate: Install luasql-postgres package")
   servergate.db.available = false
   return
 end
