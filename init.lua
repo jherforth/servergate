@@ -2,6 +2,16 @@
 -- Globals
 --
 
+-- Debug: Check if we can get insecure environment
+local ie_test = minetest.request_insecure_environment()
+if ie_test then
+  minetest.log("action", "Servergate: Successfully got insecure environment - mod is trusted")
+else
+  minetest.log("warning", "Servergate: Cannot get insecure environment - check secure.trusted_mods setting")
+  local trusted = minetest.settings:get("secure.trusted_mods") or "none"
+  minetest.log("warning", "Servergate: Current secure.trusted_mods = " .. trusted)
+end
+
 servergate = {
   modpath = minetest.get_modpath("servergate"),
   gates = {},
