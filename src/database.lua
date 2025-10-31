@@ -22,11 +22,11 @@ if not check_pgsql_config() then
   return
 end
 
--- Test if we can load the pgsql library
-local pgsql_status, pgsql_lib = pcall(require, "pgsql")
+-- Test if we can load the luasql.postgres library
+local pgsql_status, luasql = pcall(require, "luasql.postgres")
 if not pgsql_status then
-  minetest.log("warning", "Servergate: PostgreSQL library not available: " .. tostring(pgsql_lib))
-  minetest.log("warning", "Servergate: Install luasql-postgres or minetest-postgres package")
+  minetest.log("warning", "Servergate: PostgreSQL library not available: " .. tostring(luasql))
+  minetest.log("warning", "Servergate: Install luasql-postgres package")
   servergate.db.available = false
   return
 end
@@ -34,13 +34,10 @@ end
 servergate.db.available = true
 minetest.log("action", "Servergate: PostgreSQL connection configured")
 
--- Database connection string
-local function get_connection_string()
+-- Database connection parameters for LuaSQL
+local function get_connection_params()
   local s = servergate.settings
-  return string.format(
-    "host=%s port=%d dbname=%s user=%s password=%s",
-    s.db_host, s.db_port, s.db_name, s.db_user, s.db_password
-  )
+  return s.db_name, s.db_user, s.db_password, s.db_host, s.db_port
 end
 
 -- Execute a database query
@@ -52,50 +49,51 @@ function servergate.db.query(sql, callback)
     return
   end
 
-  local conn_str = get_connection_string()
+  local db_name, db_user, db_password, db_host, db_port = get_connection_params()
 
   minetest.log("action", "Servergate DB query: " .. sql:sub(1, 100))
 
   -- Execute query asynchronously
   minetest.handle_async(
-    function()
-      local pgsql = require("pgsql")
-      local conn = pgsql.connectdb(conn_str)
+    function(dbname, user, pass, host, port)
+      local luasql = require("luasql.postgres")
+      local env = luasql.postgres()
+      local conn, err = env:connect(dbname, user, pass, host, port)
 
-      if conn:status() ~= pgsql.CONNECTION_OK then
-        return {success = false, error = "Failed to connect to database: " .. tostring(conn:errorMessage())}
+      if not conn then
+        env:close()
+        return {success = false, error = "Failed to connect to database: " .. tostring(err)}
       end
 
-      local result = conn:exec(sql)
-      local status = result:status()
+      local cursor, err = conn:execute(sql)
 
-      if status == pgsql.PGRES_TUPLES_OK or status == pgsql.PGRES_COMMAND_OK then
-        local rows = {}
-        local ntuples = result:ntuples()
-        local nfields = result:nfields()
+      if not cursor then
+        conn:close()
+        env:close()
+        return {success = false, error = tostring(err)}
+      end
 
-        for i = 0, ntuples - 1 do
-          local row = {}
-          for j = 0, nfields - 1 do
-            local fname = result:fname(j)
-            row[fname] = result:getvalue(i, j)
-          end
+      local rows = {}
+      if type(cursor) == "userdata" then
+        local row = cursor:fetch({}, "a")
+        while row do
           table.insert(rows, row)
+          row = cursor:fetch({}, "a")
         end
-
-        conn:finish()
-        return {success = true, rows = rows, rowcount = ntuples}
-      else
-        local err = result:errorMessage()
-        conn:finish()
-        return {success = false, error = err}
+        cursor:close()
       end
+
+      local rowcount = #rows
+      conn:close()
+      env:close()
+      return {success = true, rows = rows, rowcount = rowcount}
     end,
     function(result)
       if callback then
         callback(result.success, result.error or result.rows, result.rowcount)
       end
-    end
+    end,
+    db_name, db_user, db_password, db_host, db_port
   )
 end
 
