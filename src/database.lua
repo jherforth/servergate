@@ -43,13 +43,21 @@ end
 servergate.db.available = true
 minetest.log("action", "Servergate: PostgreSQL connection configured")
 
--- Database connection parameters for LuaSQL
-local function get_connection_params()
+-- Initialize the PostgreSQL environment
+local pg_env = luasql.postgres()
+
+-- Get a database connection
+local function get_connection()
   local s = servergate.settings
-  return s.db_name, s.db_user, s.db_password, s.db_host, s.db_port
+  local conn, err = pg_env:connect(s.db_name, s.db_user, s.db_password, s.db_host, s.db_port)
+  if not conn then
+    minetest.log("error", "Servergate: Failed to connect to database: " .. tostring(err))
+    return nil, err
+  end
+  return conn
 end
 
--- Execute a database query
+-- Execute a database query (synchronous)
 function servergate.db.query(sql, callback)
   if not servergate.db.available then
     if callback then
@@ -58,52 +66,42 @@ function servergate.db.query(sql, callback)
     return
   end
 
-  local db_name, db_user, db_password, db_host, db_port = get_connection_params()
-
   minetest.log("action", "Servergate DB query: " .. sql:sub(1, 100))
 
-  -- Execute query asynchronously
-  minetest.handle_async(
-    function(dbname, user, pass, host, port)
-      local luasql = require("luasql.postgres")
-      local env = luasql.postgres()
-      local conn, err = env:connect(dbname, user, pass, host, port)
+  local conn, err = get_connection()
+  if not conn then
+    if callback then
+      callback(false, "Failed to connect: " .. tostring(err))
+    end
+    return
+  end
 
-      if not conn then
-        env:close()
-        return {success = false, error = "Failed to connect to database: " .. tostring(err)}
-      end
+  local cursor, err = conn:execute(sql)
 
-      local cursor, err = conn:execute(sql)
+  if not cursor then
+    conn:close()
+    if callback then
+      callback(false, tostring(err))
+    end
+    return
+  end
 
-      if not cursor then
-        conn:close()
-        env:close()
-        return {success = false, error = tostring(err)}
-      end
+  local rows = {}
+  if type(cursor) == "userdata" then
+    local row = cursor:fetch({}, "a")
+    while row do
+      table.insert(rows, row)
+      row = cursor:fetch({}, "a")
+    end
+    cursor:close()
+  end
 
-      local rows = {}
-      if type(cursor) == "userdata" then
-        local row = cursor:fetch({}, "a")
-        while row do
-          table.insert(rows, row)
-          row = cursor:fetch({}, "a")
-        end
-        cursor:close()
-      end
+  local rowcount = #rows
+  conn:close()
 
-      local rowcount = #rows
-      conn:close()
-      env:close()
-      return {success = true, rows = rows, rowcount = rowcount}
-    end,
-    function(result)
-      if callback then
-        callback(result.success, result.error or result.rows, result.rowcount)
-      end
-    end,
-    db_name, db_user, db_password, db_host, db_port
-  )
+  if callback then
+    callback(true, rows, rowcount)
+  end
 end
 
 -- Register this server in the database
