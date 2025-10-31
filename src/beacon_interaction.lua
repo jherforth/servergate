@@ -271,7 +271,10 @@ local beacon_types = {
 }
 
 for _, beacon_name in ipairs(beacon_types) do
-  minetest.override_item(beacon_name, {
-    on_rightclick = on_beacon_interact,
-  })
+  -- Only override if the node exists
+  if minetest.registered_nodes[beacon_name] then
+    minetest.override_item(beacon_name, {
+      on_rightclick = on_beacon_interact,
+    })
+  end
 end
