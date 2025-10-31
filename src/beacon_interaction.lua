@@ -193,40 +193,56 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
   if formname == "servergate:travel" then
     if fields.go then
-      local player_obj = minetest.get_player_by_name(player_name)
-      if player_obj then
+      -- Debug: confirm we received the GO signal
+      minetest.log("action", "[ServerGate] GO button pressed by " .. player_name)
+
+      -- Wrap everything in pcall to catch any crashes
+      local success, err = pcall(function()
+        local player_obj = minetest.get_player_by_name(player_name)
+        if not player_obj then
+          return
+        end
+
         local dest_url = context.dest_url
 
         -- Validate URL format
         if not dest_url or dest_url == "" or dest_url == "unknown" then
           minetest.chat_send_player(player_name, "Error: Invalid destination URL")
-          player_context[player_name] = nil
-          return true
+          return
         end
 
         servergate.log("info", "Player " .. player_name .. " attempting transfer to: " .. dest_url)
         minetest.chat_send_player(player_name, "Initiating transfer to: " .. dest_url)
 
         -- Use Minetest's request_player_transfer API
-        minetest.after(0.5, function()
-          local transfer_player = minetest.get_player_by_name(player_name)
-          if transfer_player then
-            local success, err = pcall(function()
-              return minetest.request_player_transfer(transfer_player, dest_url)
-            end)
+        minetest.after(1.0, function()
+          local success2, err2 = pcall(function()
+            local transfer_player = minetest.get_player_by_name(player_name)
+            if not transfer_player then
+              return
+            end
 
-            if not success then
-              servergate.log("error", "Transfer error for " .. player_name .. ": " .. tostring(err))
-              minetest.chat_send_player(player_name, "Transfer failed: " .. tostring(err))
-              minetest.chat_send_player(player_name, "Try manually: /connect " .. dest_url)
-            elseif not err then
+            local result = minetest.request_player_transfer(transfer_player, dest_url)
+
+            if not result then
               servergate.log("warning", "Transfer request returned false for " .. player_name)
               minetest.chat_send_player(player_name, "Transfer request failed. Try: /connect " .. dest_url)
             else
               servergate.log("info", "Transfer initiated successfully for " .. player_name)
             end
+          end)
+
+          if not success2 then
+            servergate.log("error", "Transfer error for " .. player_name .. ": " .. tostring(err2))
+            minetest.chat_send_player(player_name, "Transfer failed: " .. tostring(err2))
+            minetest.chat_send_player(player_name, "Try manually: /connect " .. dest_url)
           end
         end)
+      end)
+
+      if not success then
+        servergate.log("error", "Formspec handler error: " .. tostring(err))
+        minetest.chat_send_player(player_name, "Error: " .. tostring(err))
       end
 
       player_context[player_name] = nil
