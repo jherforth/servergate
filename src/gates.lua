@@ -112,15 +112,6 @@ if servergate.settings.native then
     end
   end
 
-  -- Generate gates
-  for x = min, max, spread do
-    for y = ymin, ymax, spread do
-      for z = min, max, spread do
-        add_gate(generate_gate(x,y,z))
-      end
-    end
-  end
-
   -- Add a guaranteed spawn gate very close to world origin (0,0,0)
   -- This ensures new players always have a gate within 100 nodes of initial spawn
   add_gate({
@@ -131,4 +122,21 @@ if servergate.settings.native then
     exact = false,
     destination = servergate.settings.native_link and vn(0, 0, 0) or nil,
   })
+
+  -- Generate gates on a grid with minimum 1000 node spacing
+  -- Skip gates that would be within 500 nodes of spawn (0,0,0) to avoid clustering
+  local spawn_exclusion_radius = 500
+  for x = min, max, spread do
+    for y = ymin, ymax, spread do
+      for z = min, max, spread do
+        -- Calculate distance from spawn (only check x/z since y varies)
+        local dist_from_spawn = math.sqrt(x * x + z * z)
+
+        -- Only generate if sufficiently far from spawn
+        if dist_from_spawn >= spawn_exclusion_radius then
+          add_gate(generate_gate(x,y,z))
+        end
+      end
+    end
+  end
 end
