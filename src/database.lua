@@ -28,7 +28,7 @@ if not pgsql_status then
   -- Check if this is a mod security issue
   if luasql and luasql:match("require.*disabled") then
     minetest.log("warning", "Servergate: PostgreSQL blocked by mod security")
-    minetest.log("warning", "Servergate: Add 'worldgate' to secure.trusted_mods in minetest.conf")
+    minetest.log("warning", "Servergate: Add 'servergate' to secure.trusted_mods in minetest.conf")
   else
     minetest.log("warning", "Servergate: PostgreSQL library not available: " .. tostring(luasql))
     minetest.log("warning", "Servergate: Install luasql-postgres package")
