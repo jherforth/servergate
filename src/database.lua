@@ -4,17 +4,35 @@
 
 servergate.db = {}
 
--- Check if PostgreSQL is available
-local pgsql_available = minetest.get_modpath("postgresql") ~= nil
+-- Check if PostgreSQL connection is configured
+local function check_pgsql_config()
+  local s = servergate.settings
+  if not s.db_host or s.db_host == "" or
+     not s.db_name or s.db_name == "" or
+     not s.db_user or s.db_user == "" then
+    return false
+  end
+  return true
+end
 
-if not pgsql_available then
-  minetest.log("warning", "Servergate: PostgreSQL not available. Database features disabled.")
-  minetest.log("warning", "Servergate: To enable database features, configure PostgreSQL backend in world.mt")
+if not check_pgsql_config() then
+  minetest.log("warning", "Servergate: PostgreSQL not configured. Database features disabled.")
+  minetest.log("warning", "Servergate: Configure servergate.db_* settings in world.mt or minetest.conf")
+  servergate.db.available = false
+  return
+end
+
+-- Test if we can load the pgsql library
+local pgsql_status, pgsql_lib = pcall(require, "pgsql")
+if not pgsql_status then
+  minetest.log("warning", "Servergate: PostgreSQL library not available: " .. tostring(pgsql_lib))
+  minetest.log("warning", "Servergate: Install luasql-postgres or minetest-postgres package")
   servergate.db.available = false
   return
 end
 
 servergate.db.available = true
+minetest.log("action", "Servergate: PostgreSQL connection configured")
 
 -- Database connection string
 local function get_connection_string()

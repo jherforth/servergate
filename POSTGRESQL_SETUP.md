@@ -13,7 +13,7 @@ This guide explains how to set up PostgreSQL for the Worldgate Server Connector 
 5. **On Luanti servers:** Add database connection info to `world.mt` (using PostgreSQL VM's IP)
 6. **Test:** Connect from Luanti server to verify: `psql -h <postgres-ip> -U worldgate -d worldgate`
 
-**You do NOT need PostgreSQL installed on Luanti servers** (just the mod configuration).
+**Important:** Luanti servers need the Lua PostgreSQL library installed to connect to the database.
 
 ## Why PostgreSQL?
 
@@ -102,7 +102,34 @@ Restart PostgreSQL:
 sudo systemctl restart postgresql
 ```
 
-### 3. Create the Worldgate Database
+### 3. Install Lua PostgreSQL Library on Luanti Servers
+
+**CRITICAL:** Each Luanti server needs the Lua PostgreSQL library to connect to the database.
+
+#### Ubuntu/Debian:
+```bash
+sudo apt-get install lua-pgsql
+```
+
+#### Alternative: Install via LuaRocks:
+```bash
+# Install LuaRocks if not installed
+sudo apt-get install luarocks
+
+# Install luapgsql
+sudo luarocks install luapgsql
+```
+
+#### Verify Installation:
+```bash
+lua -e "require('pgsql'); print('PostgreSQL library loaded successfully')"
+```
+
+If you see "PostgreSQL library loaded successfully", you're good to go!
+
+**Note:** The library must be installed on EVERY Luanti server that needs to connect to the database, not just the PostgreSQL server.
+
+### 4. Create the Worldgate Database
 
 Switch to the postgres user and create the database:
 
@@ -117,7 +144,7 @@ CREATE DATABASE worldgate;
 \q
 ```
 
-### 4. Run the Schema Script
+### 5. Run the Schema Script
 
 You have several options depending on your setup:
 
