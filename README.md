@@ -1,6 +1,8 @@
 Worldgate Server Connector
 ==========================
 
+No known API to use this mod with yet, just a concept.
+
 A Luanti/Minetest mod that generates ancient worldgate structures throughout your world and enables server-to-server player transfers. Worldgates are synchronized across multiple servers via PostgreSQL, allowing players to travel between different game servers through the gate network.
 
 **Built upon [EmptyStar's worldgate mod](https://github.com/mt-empty/worldgate)** - This mod extends the excellent foundation provided by EmptyStar's worldgate with multi-server connectivity, database synchronization, and cross-server transfer capabilities.
