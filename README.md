@@ -186,6 +186,6 @@ Each server maintains a heartbeat every 60 seconds to indicate it's active.
 **Original Mod:** [EmptyStar's worldgate](https://github.com/mt-empty/worldgate)
 This server connector variant was built upon EmptyStar's excellent worldgate mod, which provides the beautiful gate structures, mapgen integration, and core worldgate functionality. All credit for the original concept, schematics, and single-server worldgate implementation goes to EmptyStar.
 
-**Development Platform:** This mod was developed using [Bolt.new](https://bolt.new), an AI-powered coding platform that accelerates development through intelligent code assistance. Don't hate on me for it, but we do live in an age when someone has an idea, they can finally bring it to life. I hope you enjoy this mod all the same!
+**Development Platform:** This mod was developed using [Bolt.new](https://bolt.new), an AI-powered coding platform that accelerates development through intelligent code assistance. Don't hate on me for it, but we do live in an age when someone has an idea, they can finally bring it to life. I hope there in an API I can tie into to use this some day, that'd be neat.
 
 **License:** See LICENSE file for details.
